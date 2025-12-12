@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.PracticeReportDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="PracticeReportResultMap" type="com.ssm.entity.PracticeReport">
+        <id column="report_id" property="reportId" />
+        <result column="student_id" property="studentId" />
+        <result column="activity_id" property="activityId" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="attachment" property="attachment" />
+        <result column="status" property="status" />
+        <result column="feedback" property="feedback" />
+        <result column="submit_time" property="submitTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="findById" parameterType="Integer" resultMap="PracticeReportResultMap">
+        SELECT * FROM practice_report WHERE report_id = #{reportId}
+    </select>
+
+    <select id="findByStudentAndActivity" parameterType="map" resultMap="PracticeReportResultMap">
+        SELECT * FROM practice_report WHERE student_id = #{studentId} AND activity_id = #{activityId}
+    </select>
+
+    <select id="findByStudentId" parameterType="Integer" resultMap="PracticeReportResultMap">
+        SELECT * FROM practice_report WHERE student_id = #{studentId} ORDER BY submit_time DESC
+    </select>
+
+    <select id="findByActivityId" parameterType="Integer" resultMap="PracticeReportResultMap">
+        SELECT * FROM practice_report WHERE activity_id = #{activityId} ORDER BY submit_time DESC
+    </select>
+
+    <select id="findByStatus" parameterType="String" resultMap="PracticeReportResultMap">
+        SELECT * FROM practice_report WHERE status = #{status} ORDER BY submit_time DESC
+    </select>
+
+    <select id="findByActivityIdAndStatus" parameterType="map" resultMap="PracticeReportResultMap">
+        SELECT * FROM practice_report WHERE activity_id = #{activityId} AND status = #{status} ORDER BY submit_time DESC
+    </select>
+
+    <select id="countByActivityIdAndStatus" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM practice_report WHERE activity_id = #{activityId} AND status = #{status}
+    </select>
+
+    <select id="getReportStatisticsByActivity" parameterType="Integer" resultType="Object[]">
+        SELECT status, COUNT(*) as count FROM practice_report WHERE activity_id = #{activityId} GROUP BY status
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.PracticeReport" useGeneratedKeys="true" keyProperty="reportId">
+        INSERT INTO practice_report (student_id, activity_id, title, content, attachment, status, submit_time, update_time)
+        VALUES (#{studentId}, #{activityId}, #{title}, #{content}, #{attachment}, #{status}, #{submitTime}, #{updateTime})
+    </insert>
+
+    <update id="update" parameterType="com.ssm.entity.PracticeReport">
+        UPDATE practice_report
+        SET title = #{title},
+            content = #{content},
+            attachment = #{attachment},
+            status = #{status},
+            feedback = #{feedback},
+            update_time = #{updateTime}
+        WHERE report_id = #{reportId}
+    </update>
+
+    <update id="updateStatus" parameterType="map">
+        UPDATE practice_report SET status = #{status}, update_time = NOW() WHERE report_id = #{reportId}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM practice_report WHERE report_id = #{reportId}
+    </delete>
+
+    <delete id="deleteByStudentAndActivity" parameterType="map">
+        DELETE FROM practice_report WHERE student_id = #{studentId} AND activity_id = #{activityId}
+    </delete>
+</mapper>

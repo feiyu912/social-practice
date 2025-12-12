@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.ActivityTeacherDAO">
+    <resultMap id="ActivityTeacherResultMap" type="com.ssm.entity.ActivityTeacher">
+        <id column="id" property="id" />
+        <result column="activity_id" property="activityId" />
+        <result column="teacher_id" property="teacherId" />
+    </resultMap>
+
+    <select id="findTeacherIdsByActivityId" parameterType="Integer" resultType="Integer">
+        SELECT teacher_id FROM activity_teacher WHERE activity_id = #{activityId}
+    </select>
+
+    <select id="findActivityIdsByTeacherId" parameterType="Integer" resultType="Integer">
+        SELECT activity_id FROM activity_teacher WHERE teacher_id = #{teacherId}
+    </select>
+
+    <select id="checkTeacherInActivity" resultType="Integer">
+        SELECT COUNT(*) FROM activity_teacher WHERE activity_id = #{activityId} AND teacher_id = #{teacherId}
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.ActivityTeacher" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO activity_teacher (activity_id, teacher_id)
+        VALUES (#{activityId}, #{teacherId})
+    </insert>
+
+    <insert id="batchInsert">
+        INSERT INTO activity_teacher (activity_id, teacher_id)
+        VALUES
+        <foreach collection="activityTeachers" item="item" separator=",">
+            (#{item.activityId}, #{item.teacherId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByActivityId" parameterType="Integer">
+        DELETE FROM activity_teacher WHERE activity_id = #{activityId}
+    </delete>
+
+    <delete id="deleteByActivityAndTeacher">
+        DELETE FROM activity_teacher WHERE activity_id = #{activityId} AND teacher_id = #{teacherId}
+    </delete>
+</mapper>

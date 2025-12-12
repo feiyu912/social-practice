@@ -1,0 +1,120 @@
+package com.ssm.entity;
+
+import java.util.Date;
+
+/**
+ * 日常任务实体类
+ */
+public class DailyTask {
+    private Integer taskId;       // 任务ID
+    private Integer studentId;    // 学生ID
+    private Date taskDate;        // 任务日期
+    private String title;         // 任务标题
+    private String content;       // 任务内容
+    private Integer status;       // 状态(0:未完成, 1:已完成)
+    private Integer priority;     // 优先级(0-5)
+    private Date completedTime;   // 完成时间
+    private Date createTime;      // 创建时间
+    private Date updateTime;      // 更新时间
+
+    // 构造方法
+    public DailyTask() {
+    }
+
+    // getter和setter方法
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
+    public Integer getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Integer studentId) {
+        this.studentId = studentId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Date getTaskDate() {
+        return taskDate;
+    }
+
+    public void setTaskDate(Date taskDate) {
+        this.taskDate = taskDate;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Date getCompletedTime() {
+        return completedTime;
+    }
+
+    public void setCompletedTime(Date completedTime) {
+        this.completedTime = completedTime;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "DailyTask{" +
+                "taskId=" + taskId +
+                ", studentId=" + studentId +
+                ", taskDate=" + taskDate +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", status=" + status +
+                ", priority=" + priority +
+                ", completedTime=" + completedTime +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
+}

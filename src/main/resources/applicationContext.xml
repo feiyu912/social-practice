@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 1. 引入外部属性文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties" />
+
+    <!-- 2. 配置数据源（使用标准DataSource以确保兼容性）-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
+
+    <!-- 3. 配置SqlSessionFactoryBean -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 指定MyBatis核心配置文件位置 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+        <!-- 指定实体类所在的包，用于自动扫描实体类 -->
+        <property name="typeAliasesPackage" value="com.ssm.entity" />
+        <!-- 指定映射文件位置 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml" />
+    </bean>
+
+    <!-- 4. 配置MapperScannerConfigurer，用于自动扫描Mapper接口 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 指定Mapper接口所在的包 -->
+        <property name="basePackage" value="com.ssm.mapper,com.ssm.dao" />
+        <!-- 指定SqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+
+    <!-- 5. 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- 6. 开启事务注解支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    
+    <!-- 7. 扫描service层和utils层的组件 -->
+    <context:component-scan base-package="com.ssm.service,com.ssm.utils" />
+
+</beans>

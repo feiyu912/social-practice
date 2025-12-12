@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.StudentActivityDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="StudentActivityResultMap" type="com.ssm.entity.StudentActivity">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="activity_id" property="activityId" />
+        <result column="group_id" property="groupId" />
+        <result column="status" property="status" />
+        <result column="join_time" property="joinTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 包含活动信息的映射配置 -->
+    <resultMap id="StudentActivityWithActivityResultMap" type="com.ssm.entity.StudentActivity">
+        <id column="sa_id" property="id" />
+        <result column="sa_student_id" property="studentId" />
+        <result column="sa_activity_id" property="activityId" />
+        <result column="sa_group_id" property="groupId" />
+        <result column="sa_status" property="status" />
+        <result column="sa_join_time" property="joinTime" />
+        <result column="sa_update_time" property="updateTime" />
+        <association property="activity" javaType="com.ssm.entity.PracticeActivity">
+            <id column="pa_id" property="id" />
+            <result column="pa_title" property="activityName" />
+            <result column="pa_description" property="description" />
+            <result column="pa_location" property="location" />
+            <result column="pa_start_time" property="startTime" />
+            <result column="pa_end_time" property="endTime" />
+            <result column="pa_quota" property="maxParticipants" />
+            <result column="pa_current_count" property="currentParticipants" />
+            <result column="pa_status" property="status" />
+            <result column="pa_create_time" property="createTime" />
+            <result column="pa_update_time" property="updateTime" />
+            <result column="pa_activity_type" property="activityType" />
+            <result column="pa_responsible_person" property="responsiblePerson" />
+        </association>
+    </resultMap>
+    
+    <!-- 包含学生和活动信息的映射配置（教师审核用） -->
+    <resultMap id="StudentActivityWithStudentResultMap" type="com.ssm.entity.StudentActivity">
+        <id column="sa_id" property="id" />
+        <result column="sa_student_id" property="studentId" />
+        <result column="sa_activity_id" property="activityId" />
+        <result column="sa_group_id" property="groupId" />
+        <result column="sa_status" property="status" />
+        <result column="sa_join_time" property="joinTime" />
+        <result column="sa_update_time" property="updateTime" />
+        <association property="student" javaType="com.ssm.entity.Student">
+            <id column="stu_id" property="id" />
+            <result column="stu_student_id" property="studentNumber" />
+            <result column="stu_class_name" property="className" />
+            <result column="stu_user_id" property="userId" />
+            <result column="stu_phone" property="phone" />
+            <result column="stu_email" property="email" />
+            <result column="stu_real_name" property="realName" />
+        </association>
+        <association property="activity" javaType="com.ssm.entity.PracticeActivity">
+            <id column="pa_id" property="id" />
+            <result column="pa_title" property="activityName" />
+            <result column="pa_status" property="status" />
+        </association>
+    </resultMap>
+    
+    <select id="findByStudentAndActivity" resultMap="StudentActivityResultMap">
+        SELECT * FROM student_activity WHERE student_id = #{studentId} AND activity_id = #{activityId}
+    </select>
+
+    <select id="findByStudentId" parameterType="Integer" resultMap="StudentActivityResultMap">
+        SELECT * FROM student_activity WHERE student_id = #{studentId} ORDER BY join_time DESC
+    </select>
+    
+    <select id="findByStudentIdWithActivity" parameterType="Integer" resultMap="StudentActivityWithActivityResultMap">
+        SELECT 
+            sa.id as sa_id,
+            sa.student_id as sa_student_id,
+            sa.activity_id as sa_activity_id,
+            sa.group_id as sa_group_id,
+            sa.status as sa_status,
+            sa.join_time as sa_join_time,
+            sa.update_time as sa_update_time,
+            pa.id as pa_id,
+            pa.title as pa_title,
+            pa.description as pa_description,
+            pa.location as pa_location,
+            pa.start_time as pa_start_time,
+            pa.end_time as pa_end_time,
+            pa.quota as pa_quota,
+            pa.current_count as pa_current_count,
+            pa.status as pa_status,
+            pa.create_time as pa_create_time,
+            pa.update_time as pa_update_time,
+            NULL as pa_activity_type,
+            (SELECT GROUP_CONCAT(u.name) FROM activity_teacher at 
+             JOIN teacher t ON at.teacher_id = t.id 
+             JOIN user u ON t.user_id = u.id 
+             WHERE at.activity_id = pa.id) as pa_responsible_person
+        FROM student_activity sa
+        JOIN practice_activity pa ON sa.activity_id = pa.id
+        WHERE sa.student_id = #{studentId}
+        ORDER BY sa.join_time DESC
+    </select>
+    
+    <select id="findByActivityId" parameterType="Integer" resultMap="StudentActivityResultMap">
+        SELECT * FROM student_activity WHERE activity_id = #{activityId} ORDER BY join_time DESC
+    </select>
+    
+    <!-- 根据活动ID查询报名列表（包含学生信息，教师审核用） -->
+    <select id="findByActivityIdWithStudent" parameterType="Integer" resultMap="StudentActivityWithStudentResultMap">
+        SELECT 
+            sa.id as sa_id,
+            sa.student_id as sa_student_id,
+            sa.activity_id as sa_activity_id,
+            sa.group_id as sa_group_id,
+            sa.status as sa_status,
+            sa.join_time as sa_join_time,
+            sa.update_time as sa_update_time,
+            s.id as stu_id,
+            s.student_id as stu_student_id,
+            s.class_name as stu_class_name,
+            s.user_id as stu_user_id,
+            s.phone as stu_phone,
+            s.email as stu_email,
+            u.name as stu_real_name,
+            pa.id as pa_id,
+            pa.title as pa_title,
+            pa.status as pa_status
+        FROM student_activity sa
+        JOIN student s ON sa.student_id = s.id
+        JOIN user u ON s.user_id = u.id
+        JOIN practice_activity pa ON sa.activity_id = pa.id
+        WHERE sa.activity_id = #{activityId}
+        ORDER BY sa.join_time DESC
+    </select>
+
+    <select id="findByActivityIdAndStatus" resultMap="StudentActivityResultMap">
+        SELECT * FROM student_activity WHERE activity_id = #{activityId} AND status = #{status}
+        ORDER BY join_time DESC
+    </select>
+
+    <select id="countByActivityId" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(*) FROM student_activity WHERE activity_id = #{activityId}
+    </select>
+
+    <select id="countByActivityIdAndStatus" resultType="Integer">
+        SELECT COUNT(*) FROM student_activity WHERE activity_id = #{activityId} AND status = #{status}
+    </select>
+
+    <select id="findByGroupId" parameterType="Integer" resultType="Integer">
+        SELECT student_id FROM student_activity WHERE group_id = #{groupId}
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.StudentActivity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student_activity (student_id, activity_id, group_id, status, join_time, update_time)
+        VALUES (#{studentId}, #{activityId}, #{groupId}, #{status}, #{joinTime}, #{updateTime})
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE student_activity SET status = #{status}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateGroupId">
+        UPDATE student_activity SET group_id = #{groupId}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM student_activity WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByStudentAndActivity">
+        DELETE FROM student_activity WHERE student_id = #{studentId} AND activity_id = #{activityId}
+    </delete>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 设置全局配置 -->
+    <settings>
+        <!-- 开启自动驼峰命名规则映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+        <!-- 开启延迟加载 -->
+        <setting name="lazyLoadingEnabled" value="true" />
+        <setting name="aggressiveLazyLoading" value="false" />
+        <!-- 配置日志输出 -->
+        <setting name="logImpl" value="LOG4J" />
+    </settings>
+    
+    <!-- 映射文件会由Spring的MapperScannerConfigurer自动扫描，这里不需要显式配置 -->
+</configuration>

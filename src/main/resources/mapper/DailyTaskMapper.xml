@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.DailyTaskDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="DailyTaskResultMap" type="com.ssm.entity.DailyTask">
+        <id column="id" property="taskId" />
+        <result column="student_id" property="studentId" />
+        <result column="title" property="title" />
+        <result column="task_date" property="taskDate" />
+        <result column="content" property="content" />
+        <result column="status" property="status" />
+        <result column="priority" property="priority" />
+        <result column="completed_time" property="completedTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="findById" parameterType="Integer" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task WHERE id = #{taskId}
+    </select>
+
+    <select id="findByStudentId" parameterType="Integer" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task WHERE student_id = #{studentId} ORDER BY task_date DESC
+    </select>
+
+    <select id="findByStudentIdAndStatus" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task WHERE student_id = #{studentId} AND status = #{status} ORDER BY task_date DESC
+    </select>
+
+    <select id="findByDateRange" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task WHERE student_id = #{studentId} AND task_date BETWEEN #{startDate} AND #{endDate} ORDER BY task_date DESC
+    </select>
+
+    <select id="findTodayTasks" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task WHERE student_id = #{studentId} AND task_date = #{date} ORDER BY task_date DESC
+    </select>
+
+    <select id="findPendingTasks" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task WHERE student_id = #{studentId} AND status = 0 ORDER BY task_date ASC
+    </select>
+
+    <select id="getTaskStatistics" resultType="Object[]">
+        SELECT status, COUNT(*) as count FROM daily_task WHERE student_id = #{studentId} GROUP BY status
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.DailyTask" useGeneratedKeys="true" keyProperty="taskId">
+        INSERT INTO daily_task (student_id, title, content, task_date, status, priority, create_time, update_time)
+        VALUES (#{studentId}, #{title}, #{content}, #{taskDate}, #{status}, #{priority}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update" parameterType="com.ssm.entity.DailyTask">
+        UPDATE daily_task
+        SET title = #{title},
+            content = #{content},
+            task_date = #{taskDate},
+            status = #{status},
+            priority = #{priority},
+            update_time = #{updateTime}
+        WHERE id = #{taskId}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE daily_task SET status = #{status}, update_time = NOW() WHERE id = #{taskId}
+    </update>
+
+    <update id="updateCompletedTime">
+        UPDATE daily_task SET completed_time = #{completedTime}, update_time = NOW() WHERE id = #{taskId}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM daily_task WHERE id = #{taskId}
+    </delete>
+
+    <delete id="batchDelete">
+        DELETE FROM daily_task WHERE id IN
+        <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+    </delete>
+</mapper>

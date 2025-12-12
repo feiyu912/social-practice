@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.TeacherDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="TeacherResultMap" type="com.ssm.entity.Teacher">
+        <id column="id" property="id" />
+        <result column="id" property="teacherId" />
+        <result column="teacher_id" property="teacherNumber" />
+        <result column="department" property="department" />
+        <result column="college" property="college" />
+        <result column="user_id" property="userId" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="real_name" property="realName" />
+        <result column="gender" property="gender" />
+        <result column="position" property="position" />
+    </resultMap>
+
+    <select id="findById" parameterType="Integer" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        WHERE t.id = #{teacherId}
+    </select>
+
+    <select id="findByUserId" parameterType="Integer" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        WHERE t.user_id = #{userId}
+    </select>
+
+    <select id="findByTeacherNumber" parameterType="String" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        WHERE t.teacher_id = #{teacherNumber}
+    </select>
+
+    <select id="findAll" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="count" resultType="Integer">
+        SELECT COUNT(*) FROM teacher
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.Teacher" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO teacher (teacher_id, department, phone, email, user_id)
+        VALUES (#{teacherNumber}, #{department}, #{phone}, #{email}, #{userId})
+    </insert>
+
+    <update id="update" parameterType="com.ssm.entity.Teacher">
+        UPDATE teacher
+        SET teacher_id = #{teacherNumber},
+            department = #{department},
+            phone = #{phone},
+            email = #{email}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM teacher WHERE id = #{teacherId}
+    </delete>
+
+    <select id="searchByKeyword" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        WHERE t.teacher_id LIKE CONCAT('%', #{keyword}, '%')
+           OR u.name LIKE CONCAT('%', #{keyword}, '%')
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="findByName" parameterType="String" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        WHERE u.name = #{name}
+    </select>
+    
+    <select id="findByDepartment" parameterType="String" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        WHERE t.department = #{department}
+    </select>
+    
+    <select id="findByTitle" parameterType="String" resultMap="TeacherResultMap">
+        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, 
+               u.name as real_name, NULL as gender, NULL as position
+        FROM teacher t
+        LEFT JOIN user u ON t.user_id = u.id
+        WHERE t.department = #{title}
+    </select>
+</mapper>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.PracticeActivityDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="PracticeActivityResultMap" type="com.ssm.entity.PracticeActivity">
+        <id column="id" property="id" />
+        <result column="id" property="activityId" />
+        <result column="title" property="activityName" />
+        <result column="description" property="description" />
+        <result column="location" property="location" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="quota" property="maxParticipants" />
+        <result column="current_count" property="currentParticipants" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="activity_type" property="activityType" />
+        <result column="responsible_person" property="responsiblePerson" />
+    </resultMap>
+
+    <select id="findById" parameterType="Integer" resultMap="PracticeActivityResultMap">
+        SELECT pa.*, 
+               NULL as activity_type,
+               (SELECT GROUP_CONCAT(u.name) FROM activity_teacher at 
+                JOIN teacher t ON at.teacher_id = t.id 
+                JOIN user u ON t.user_id = u.id 
+                WHERE at.activity_id = pa.id) as responsible_person
+        FROM practice_activity pa 
+        WHERE pa.id = #{activityId}
+    </select>
+
+    <select id="findAll" resultMap="PracticeActivityResultMap">
+        SELECT pa.*, 
+               NULL as activity_type,
+               (SELECT GROUP_CONCAT(u.name) FROM activity_teacher at 
+                JOIN teacher t ON at.teacher_id = t.id 
+                JOIN user u ON t.user_id = u.id 
+                WHERE at.activity_id = pa.id) as responsible_person
+        FROM practice_activity pa 
+        ORDER BY pa.create_time DESC 
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="findByTeacherId" resultMap="PracticeActivityResultMap">
+        SELECT pa.*, 
+               NULL as activity_type,
+               (SELECT GROUP_CONCAT(u.name) FROM activity_teacher at2 
+                JOIN teacher t ON at2.teacher_id = t.id 
+                JOIN user u ON t.user_id = u.id 
+                WHERE at2.activity_id = pa.id) as responsible_person
+        FROM practice_activity pa
+        JOIN activity_teacher at ON pa.id = at.activity_id
+        WHERE at.teacher_id = #{teacherId}
+        ORDER BY pa.create_time DESC LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="findByStatus" resultMap="PracticeActivityResultMap">
+        SELECT pa.*, 
+               NULL as activity_type,
+               (SELECT GROUP_CONCAT(u.name) FROM activity_teacher at 
+                JOIN teacher t ON at.teacher_id = t.id 
+                JOIN user u ON t.user_id = u.id 
+                WHERE at.activity_id = pa.id) as responsible_person
+        FROM practice_activity pa 
+        WHERE pa.status = #{status}
+        ORDER BY pa.create_time DESC LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="count" resultType="Integer">
+        SELECT COUNT(*) FROM practice_activity
+    </select>
+
+    <select id="countByTeacherId" resultType="Integer">
+        SELECT COUNT(DISTINCT pa.id) FROM practice_activity pa
+        JOIN activity_teacher at ON pa.id = at.activity_id
+        WHERE at.teacher_id = #{teacherId}
+    </select>
+
+    <select id="countByStatus" parameterType="String" resultType="Integer">
+        SELECT COUNT(*) FROM practice_activity WHERE status = #{status}
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.PracticeActivity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO practice_activity 
+        (title, description, location, start_time, end_time, quota, current_count, status, create_time, update_time)
+        VALUES 
+        (#{activityName}, #{description}, #{location}, #{startTime}, #{endTime}, #{maxParticipants}, #{currentParticipants}, #{status}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update" parameterType="com.ssm.entity.PracticeActivity">
+        UPDATE practice_activity
+        SET title = #{activityName},
+            description = #{description},
+            location = #{location},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            quota = #{maxParticipants},
+            status = #{status},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE practice_activity SET status = #{status}, update_time = NOW() WHERE id = #{activityId}
+    </update>
+
+    <update id="updateParticipantCount">
+        UPDATE practice_activity SET current_count = #{count}, update_time = NOW() WHERE id = #{activityId}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM practice_activity WHERE id = #{activityId}
+    </delete>
+
+    <select id="searchByKeyword" resultMap="PracticeActivityResultMap">
+        SELECT pa.*, 
+               NULL as activity_type,
+               (SELECT GROUP_CONCAT(u.name) FROM activity_teacher at 
+                JOIN teacher t ON at.teacher_id = t.id 
+                JOIN user u ON t.user_id = u.id 
+                WHERE at.activity_id = pa.id) as responsible_person
+        FROM practice_activity pa
+        WHERE pa.title LIKE CONCAT('%', #{keyword}, '%')
+           OR pa.description LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY pa.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+</mapper>

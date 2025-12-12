@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.GradeInfoDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="GradeInfoResultMap" type="com.ssm.entity.GradeInfo">
+        <id column="grade_id" property="gradeId" />
+        <result column="student_id" property="studentId" />
+        <result column="activity_id" property="activityId" />
+        <result column="teacher_id" property="teacherId" />
+        <result column="score" property="score" />
+        <result column="comment" property="comment" />
+        <result column="grade_time" property="gradeTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="findById" parameterType="Integer" resultMap="GradeInfoResultMap">
+        SELECT * FROM grade_info WHERE grade_id = #{gradeId}
+    </select>
+
+    <select id="findByStudentAndActivity" resultMap="GradeInfoResultMap">
+        SELECT * FROM grade_info WHERE student_id = #{studentId} AND activity_id = #{activityId}
+    </select>
+
+    <select id="findByStudentId" parameterType="Integer" resultMap="GradeInfoResultMap">
+        SELECT * FROM grade_info WHERE student_id = #{studentId} ORDER BY grade_time DESC
+    </select>
+
+    <select id="findByActivityId" parameterType="Integer" resultMap="GradeInfoResultMap">
+        SELECT * FROM grade_info WHERE activity_id = #{activityId} ORDER BY grade_time DESC
+    </select>
+
+    <select id="findByTeacherId" parameterType="Integer" resultMap="GradeInfoResultMap">
+        SELECT * FROM grade_info WHERE teacher_id = #{teacherId} ORDER BY grade_time DESC
+    </select>
+
+    <select id="getAverageScoreByActivity" parameterType="Integer" resultType="Double">
+        SELECT AVG(score) FROM grade_info WHERE activity_id = #{activityId}
+    </select>
+
+    <select id="getScoreStatisticsByActivity" resultType="Object[]">
+        SELECT score, COUNT(*) as count FROM grade_info WHERE activity_id = #{activityId} GROUP BY score ORDER BY score
+    </select>
+
+    <select id="findByStudentAndActivityAndTeacher" resultMap="GradeInfoResultMap">
+        SELECT * FROM grade_info 
+        WHERE student_id = #{studentId} AND activity_id = #{activityId} AND teacher_id = #{teacherId}
+    </select>
+
+    <select id="findAllGradesByStudentAndActivity" resultMap="GradeInfoResultMap">
+        SELECT * FROM grade_info 
+        WHERE student_id = #{studentId} AND activity_id = #{activityId}
+        ORDER BY grade_time DESC
+    </select>
+
+    <select id="getAverageScoreByStudentAndActivity" resultType="Double">
+        SELECT AVG(score) FROM grade_info 
+        WHERE student_id = #{studentId} AND activity_id = #{activityId}
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.GradeInfo" useGeneratedKeys="true" keyProperty="gradeId">
+        INSERT INTO grade_info (student_id, activity_id, teacher_id, score, comment, grade_time, update_time)
+        VALUES (#{studentId}, #{activityId}, #{teacherId}, #{score}, #{comment}, #{gradeTime}, #{updateTime})
+    </insert>
+
+    <update id="update" parameterType="com.ssm.entity.GradeInfo">
+        UPDATE grade_info
+        SET score = #{score},
+            comment = #{comment},
+            update_time = #{updateTime}
+        WHERE grade_id = #{gradeId}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM grade_info WHERE grade_id = #{gradeId}
+    </delete>
+
+    <delete id="deleteByStudentAndActivity">
+        DELETE FROM grade_info WHERE student_id = #{studentId} AND activity_id = #{activityId}
+    </delete>
+</mapper>

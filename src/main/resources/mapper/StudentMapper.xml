@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.StudentDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="StudentResultMap" type="com.ssm.entity.Student">
+        <id column="id" property="id" />
+        <result column="id" property="studentId" />
+        <result column="student_id" property="studentNumber" />
+        <result column="class_name" property="className" />
+        <result column="user_id" property="userId" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="real_name" property="realName" />
+        <result column="gender" property="gender" />
+    </resultMap>
+
+    <select id="findById" parameterType="Integer" resultMap="StudentResultMap">
+        SELECT s.id, s.student_id, s.class_name, s.user_id, s.phone, s.email, 
+               u.name as real_name, NULL as gender
+        FROM student s
+        LEFT JOIN user u ON s.user_id = u.id
+        WHERE s.id = #{studentId}
+    </select>
+
+    <select id="findByUserId" parameterType="Integer" resultMap="StudentResultMap">
+        SELECT s.id, s.student_id, s.class_name, s.user_id, s.phone, s.email, 
+               u.name as real_name, NULL as gender
+        FROM student s
+        LEFT JOIN user u ON s.user_id = u.id
+        WHERE s.user_id = #{userId}
+    </select>
+
+    <select id="findByStudentNumber" parameterType="String" resultMap="StudentResultMap">
+        SELECT s.id, s.student_id, s.class_name, s.user_id, s.phone, s.email, 
+               u.name as real_name, NULL as gender
+        FROM student s
+        LEFT JOIN user u ON s.user_id = u.id
+        WHERE s.student_id = #{studentNumber}
+    </select>
+
+    <select id="findAll" resultMap="StudentResultMap">
+        SELECT s.id, s.student_id, s.class_name, s.user_id, s.phone, s.email, 
+               u.name as real_name, NULL as gender
+        FROM student s
+        LEFT JOIN user u ON s.user_id = u.id
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="count" resultType="Integer">
+        SELECT COUNT(*) FROM student
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.Student" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student (student_id, class_name, phone, email, user_id)
+        VALUES (#{studentNumber}, #{className}, #{phone}, #{email}, #{userId})
+    </insert>
+
+    <update id="update" parameterType="com.ssm.entity.Student">
+        UPDATE student
+        SET student_id = #{studentNumber},
+            class_name = #{className},
+            phone = #{phone},
+            email = #{email}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM student WHERE id = #{studentId}
+    </delete>
+
+    <select id="searchByKeyword" resultMap="StudentResultMap">
+        SELECT s.id, s.student_id, s.class_name, s.user_id, s.phone, s.email, 
+               u.name as real_name, NULL as gender
+        FROM student s
+        LEFT JOIN user u ON s.user_id = u.id
+        WHERE s.student_id LIKE CONCAT('%', #{keyword}, '%')
+           OR u.name LIKE CONCAT('%', #{keyword}, '%')
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="findByName" parameterType="String" resultMap="StudentResultMap">
+        SELECT s.id, s.student_id, s.class_name, s.user_id, s.phone, s.email, 
+               u.name as real_name, NULL as gender
+        FROM student s
+        LEFT JOIN user u ON s.user_id = u.id
+        WHERE u.name = #{name}
+    </select>
+    
+    <select id="findByClassName" parameterType="String" resultMap="StudentResultMap">
+        SELECT s.id, s.student_id, s.class_name, s.user_id, s.phone, s.email, 
+               u.name as real_name, NULL as gender
+        FROM student s
+        LEFT JOIN user u ON s.user_id = u.id
+        WHERE s.class_name = #{className}
+    </select>
+</mapper>

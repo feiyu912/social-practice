@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.NoticeDAO">
+    <!-- 字段映射配置 -->
+    <resultMap id="NoticeResultMap" type="com.ssm.entity.Notice">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="publisher_id" property="publisherId" />
+        <result column="publish_time" property="publishTime" />
+        <result column="expiry_time" property="expiryTime" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <select id="findById" parameterType="Integer" resultMap="NoticeResultMap">
+        SELECT * FROM notice WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="NoticeResultMap">
+        SELECT * FROM notice ORDER BY publish_time DESC
+    </select>
+
+    <select id="findValidNotices" resultMap="NoticeResultMap">
+        SELECT * FROM notice WHERE status = 'published' 
+        AND (expiry_time IS NULL OR expiry_time > NOW())
+        ORDER BY publish_time DESC
+    </select>
+
+    <select id="findByPublisherId" parameterType="Integer" resultMap="NoticeResultMap">
+        SELECT * FROM notice WHERE publisher_id = #{publisherId} ORDER BY publish_time DESC
+    </select>
+
+    <select id="findByTitleLike" parameterType="String" resultMap="NoticeResultMap">
+        SELECT * FROM notice WHERE title LIKE CONCAT('%', #{title}, '%') ORDER BY publish_time DESC
+    </select>
+
+    <select id="findByTitleOrContent" parameterType="String" resultMap="NoticeResultMap">
+        SELECT * FROM notice 
+        WHERE title LIKE CONCAT('%', #{keyword}, '%') 
+           OR content LIKE CONCAT('%', #{keyword}, '%') 
+        ORDER BY publish_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.ssm.entity.Notice" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO notice (title, content, publisher_id, publish_time, expiry_time, status)
+        VALUES (#{title}, #{content}, #{publisherId}, #{publishTime}, #{expiryTime}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.ssm.entity.Notice">
+        UPDATE notice
+        SET title = #{title},
+            content = #{content},
+            expiry_time = #{expiryTime},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE notice SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM notice WHERE id = #{id}
+    </delete>
+
+    <select id="count" resultType="Integer">
+        SELECT COUNT(*) FROM notice
+    </select>
+
+    <select id="countValid" resultType="Integer">
+        SELECT COUNT(*) FROM notice WHERE status = 'published' 
+        AND (expiry_time IS NULL OR expiry_time > NOW())
+    </select>
+</mapper>
