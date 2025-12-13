@@ -205,7 +205,7 @@ public class DailyTaskController {
                     List<DailyTask> tasks = dailyTaskService.findByStudentIdAndActivityId(sa.getStudent().getId(), activityId);
                     item.put("tasks", tasks);
                     item.put("taskCount", tasks.size());
-                    long completedCount = tasks.stream().filter(t -> t.getStatus() != null && t.getStatus() == 1).count();
+                    long completedCount = tasks.stream().filter(t -> "completed".equals(t.getStatus())).count();
                     item.put("completedCount", completedCount);
                     studentTasks.add(item);
                 }

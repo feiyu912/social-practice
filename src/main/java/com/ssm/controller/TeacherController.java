@@ -83,7 +83,7 @@ public class TeacherController {
         Teacher teacher = new Teacher();
         teacher.setTeacherNumber(teacherNumber);
         teacher.setRealName(name);
-        teacher.setGender("男".equals(genderStr) ? 1 : 0);
+        teacher.setGender(genderStr);
         teacher.setDepartment(department);
         teacher.setPosition(position);
         teacher.setPhone(phone);
@@ -127,7 +127,7 @@ public class TeacherController {
         if (teacherName != null) {
             teacher.setRealName(teacherName);
         }
-        teacher.setGender("男".equals(genderStr) ? 1 : 0);
+        teacher.setGender(genderStr);
         teacher.setDepartment(department);
         teacher.setPosition(position);
         teacher.setPhone(phone);

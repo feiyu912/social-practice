@@ -1,6 +1,7 @@
 package com.ssm.service;
 
 import com.ssm.entity.DailyTask;
+
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface DailyTaskService {
     DailyTask findById(Integer taskId);
 
     /**
-     * 根据学生ID查询任务列表
+     * 根据学生ID查询任务
      * @param studentId 学生ID
      * @return 任务列表
      */
@@ -28,7 +29,7 @@ public interface DailyTaskService {
      * @param status 状态
      * @return 任务列表
      */
-    List<DailyTask> findByStudentIdAndStatus(Integer studentId, Integer status);
+    List<DailyTask> findByStudentIdAndStatus(Integer studentId, String status);
 
     /**
      * 根据日期范围查询任务
@@ -48,23 +49,16 @@ public interface DailyTaskService {
     List<DailyTask> findTodayTasks(Integer studentId, Date date);
 
     /**
-     * 查询待完成任务
-     * @param studentId 学生ID
-     * @return 任务列表
-     */
-    List<DailyTask> findPendingTasks(Integer studentId);
-
-    /**
      * 添加任务
      * @param dailyTask 任务对象
-     * @return 是否成功
+     * @return 是否添加成功
      */
     boolean addTask(DailyTask dailyTask);
 
     /**
      * 更新任务信息
      * @param dailyTask 任务对象
-     * @return 是否成功
+     * @return 是否更新成功
      */
     boolean updateTask(DailyTask dailyTask);
 
@@ -72,28 +66,28 @@ public interface DailyTaskService {
      * 更新任务状态
      * @param taskId 任务ID
      * @param status 状态
-     * @return 是否成功
+     * @return 是否更新成功
      */
-    boolean updateStatus(Integer taskId, Integer status);
+    boolean updateTaskStatus(Integer taskId, String status);
 
     /**
-     * 完成任务
+     * 更新任务完成时间
      * @param taskId 任务ID
-     * @return 是否成功
+     * @return 是否更新成功
      */
     boolean completeTask(Integer taskId);
 
     /**
      * 删除任务
      * @param taskId 任务ID
-     * @return 是否成功
+     * @return 是否删除成功
      */
     boolean deleteTask(Integer taskId);
 
     /**
      * 批量删除任务
      * @param taskIds 任务ID列表
-     * @return 删除成功的数量
+     * @return 删除的数量
      */
     int batchDeleteTasks(List<Integer> taskIds);
 
@@ -105,9 +99,9 @@ public interface DailyTaskService {
     List<Object[]> getTaskStatistics(Integer studentId);
     
     /**
-     * 获取学生待完成的任务数量
+     * 获取学生待完成任务数
      * @param studentId 学生ID
-     * @return 待完成任务数量
+     * @return 待完成任务数
      */
     int getPendingTaskCount(Integer studentId);
     
@@ -126,5 +120,3 @@ public interface DailyTaskService {
      */
     List<DailyTask> findByActivityId(Integer activityId);
 }
-
-

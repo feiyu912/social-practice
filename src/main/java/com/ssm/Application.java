@@ -2,7 +2,7 @@ package com.ssm;
 
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.Context;
-import org.apache.catalina.connector.Connector;
+
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.catalina.webresources.DirResourceSet;

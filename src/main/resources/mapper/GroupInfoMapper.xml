@@ -8,6 +8,7 @@
         <result column="group_name" property="groupName" />
         <result column="leader_id" property="leaderId" />
         <result column="member_count" property="memberCount" />
+        <result column="max_members" property="maxMembers" />
         <result column="status" property="status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
@@ -26,8 +27,8 @@
     </select>
 
     <insert id="insert" parameterType="com.ssm.entity.GroupInfo" useGeneratedKeys="true" keyProperty="groupId">
-        INSERT INTO group_info (activity_id, group_name, leader_id, member_count, status, create_time, update_time)
-        VALUES (#{activityId}, #{groupName}, #{leaderId}, #{memberCount}, #{status}, #{createTime}, #{updateTime})
+        INSERT INTO group_info (activity_id, group_name, leader_id, member_count, max_members, status, create_time, update_time)
+        VALUES (#{activityId}, #{groupName}, #{leaderId}, #{memberCount}, #{maxMembers}, #{status}, #{createTime}, #{updateTime})
     </insert>
 
     <update id="update" parameterType="com.ssm.entity.GroupInfo">
@@ -35,6 +36,7 @@
         SET group_name = #{groupName},
             leader_id = #{leaderId},
             member_count = #{memberCount},
+            max_members = #{maxMembers},
             status = #{status},
             update_time = #{updateTime}
         WHERE group_id = #{groupId}

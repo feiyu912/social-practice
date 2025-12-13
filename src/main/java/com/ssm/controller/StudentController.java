@@ -58,7 +58,7 @@ public class StudentController {
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public String doAdd(@RequestParam("studentId") String studentNumber,
                         @RequestParam("realName") String realName,
-                        @RequestParam(value = "gender", required = false, defaultValue = "1") Integer gender,
+                        @RequestParam(value = "gender", required = false, defaultValue = "男") String gender,
                         @RequestParam(value = "className", required = false) String className,
                         @RequestParam(value = "phone", required = false) String phone,
                         @RequestParam(value = "email", required = false) String email,
@@ -125,7 +125,7 @@ public class StudentController {
     public String doEdit(@RequestParam("id") Integer id,
                          @RequestParam(value = "studentId", required = false) String studentNumber,
                          @RequestParam(value = "realName", required = false) String realName,
-                         @RequestParam(value = "gender", required = false, defaultValue = "1") Integer gender,
+                         @RequestParam(value = "gender", required = false, defaultValue = "男") String gender,
                          @RequestParam(value = "className", required = false) String className,
                          @RequestParam(value = "phone", required = false) String phone,
                          @RequestParam(value = "email", required = false) String email,

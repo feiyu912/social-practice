@@ -13,6 +13,8 @@ public class Notice {
     private Date publishTime;     // 发布时间
     private Date expiryTime;      // 到期时间
     private String status;        // 状态(draft/published/expired)
+    private Date createTime;      // 创建时间
+    private Date updateTime;      // 更新时间
 
     // getter和setter方法
     public Integer getId() {
@@ -69,6 +71,22 @@ public class Notice {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     @Override

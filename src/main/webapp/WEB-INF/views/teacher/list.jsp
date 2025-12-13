@@ -107,9 +107,27 @@
             text-decoration: none;
             font-size: 12px;
         }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+        .back-button:hover {
+            background-color: #40a9ff;
+        }
     </style>
 </head>
 <body>
+    <a href="javascript:history.back()" class="back-button">返回上一页</a>
     <div class="content">
         <h2 class="page-title">教师管理</h2>
         
@@ -146,7 +164,7 @@
                             <tr>
                                 <td>${teacher.teacherNumber}</td>
                                 <td>${teacher.realName != null ? teacher.realName : ''}</td>
-                                <td>${teacher.gender != null && teacher.gender == 1 ? '男' : '女'}</td>
+                                <td>${empty teacher.gender ? '未知' : teacher.gender}</td>
                                 <td>${teacher.college != null ? teacher.college : teacher.department}</td>
                                 <td>${teacher.position != null ? teacher.position : '未指定'}</td>
                                 <td>${teacher.phone}</td>

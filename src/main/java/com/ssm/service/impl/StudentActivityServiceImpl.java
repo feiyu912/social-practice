@@ -63,6 +63,15 @@ public class StudentActivityServiceImpl implements StudentActivityService {
             if (activity == null || !"recruiting".equals(activity.getStatus())) {
                 return false; // 活动不存在或不是招募中状态
             }
+            
+            // 检查当前时间是否在活动时间范围内
+            Date now = new Date();
+            if (activity.getStartTime() != null && now.before(activity.getStartTime())) {
+                return false; // 活动还未开始
+            }
+            if (activity.getEndTime() != null && now.after(activity.getEndTime())) {
+                return false; // 活动已结束
+            }
 
             // 检查是否已经报名
             if (isStudentRegistered(studentId, activityId)) {

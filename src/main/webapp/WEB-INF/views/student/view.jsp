@@ -30,7 +30,7 @@
             <div class="row"><div class="label">学生ID：</div><div class="value">${student.id}</div></div>
             <div class="row"><div class="label">学号：</div><div class="value">${student.studentNumber}</div></div>
             <div class="row"><div class="label">姓名：</div><div class="value">${student.realName}</div></div>
-            <div class="row"><div class="label">性别：</div><div class="value"><c:choose><c:when test="${student.gender == 1}">男</c:when><c:when test="${student.gender == 0}">女</c:when><c:otherwise>未填写</c:otherwise></c:choose></div></div>
+            <div class="row"><div class="label">性别：</div><div class="value">${empty student.gender ? '未填写' : student.gender}</div></div>
             <div class="row"><div class="label">班级：</div><div class="value">${student.className}</div></div>
             <div class="row"><div class="label">手机号：</div><div class="value">${student.phone}</div></div>
             <div class="row"><div class="label">邮箱：</div><div class="value">${student.email}</div></div>

@@ -37,7 +37,7 @@
     </select>
 
     <select id="findPendingTasks" resultMap="DailyTaskResultMap">
-        SELECT * FROM daily_task WHERE student_id = #{studentId} AND status = 0 ORDER BY task_date ASC
+        SELECT * FROM daily_task WHERE student_id = #{studentId} AND status = 'pending' ORDER BY task_date ASC
     </select>
 
     <select id="getTaskStatistics" resultType="Object[]">

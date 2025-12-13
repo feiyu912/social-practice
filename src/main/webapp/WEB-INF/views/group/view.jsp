@@ -39,7 +39,14 @@
     <div class="content">
         <div class="info-box">
             <h3>${group.groupName}</h3>
-            <p>组长ID：${group.leaderId}</p>
+            <p>组长：
+                <c:choose>
+                    <c:when test="${group.leader != null}">
+                        ${group.leader.realName} (${group.leader.studentNumber}) - ${group.leader.className}
+                    </c:when>
+                    <c:otherwise>未设置</c:otherwise>
+                </c:choose>
+            </p>
             <p>成员数量：${group.memberCount}</p>
             <p>状态：
                 <c:choose>
@@ -53,17 +60,40 @@
         <div class="info-box">
             <h3>小组成员</h3>
             <c:choose>
-                <c:when test="${empty members}">
+                <c:when test="${empty group.members}">
                     <p>暂无成员</p>
                 </c:when>
                 <c:otherwise>
-                    <ul>
-                        <c:forEach items="${members}" var="memberId">
-                            <li>学生ID: ${memberId}</li>
-                        </c:forEach>
-                    </ul>
+                    <table style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #fafafa; border-bottom: 1px solid #ddd;">
+                                <th style="padding: 10px; text-align: left;">学号</th>
+                                <th style="padding: 10px; text-align: left;">姓名</th>
+                                <th style="padding: 10px; text-align: left;">性别</th>
+                                <th style="padding: 10px; text-align: left;">班级</th>
+                                <th style="padding: 10px; text-align: left;">联系电话</th>
+                                <th style="padding: 10px; text-align: left;">邮箱</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${group.members}" var="member">
+                                <tr style="border-bottom: 1px solid #f0f0f0;">
+                                    <td style="padding: 10px;">${member.studentNumber}</td>
+                                    <td style="padding: 10px;">${member.realName}</td>
+                                    <td style="padding: 10px;">${member.gender != null ? member.gender : '未知'}</td>
+                                    <td style="padding: 10px;">${member.className}</td>
+                                    <td style="padding: 10px;">${member.phone}</td>
+                                    <td style="padding: 10px;">${member.email}</td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
                 </c:otherwise>
             </c:choose>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="javascript:history.back()" style="padding: 8px 16px; background-color: #1890ff; color: white; text-decoration: none; border-radius: 4px;">返回</a>
         </div>
     </div>
 </body>

@@ -101,7 +101,7 @@
             
             <div class="info-group">
                 <span class="label">性别：</span>
-                <span class="value">${teacher.gender == 1 ? '男' : '女'}</span>
+                <span class="value">${empty teacher.gender ? '未填写' : teacher.gender}</span>
             </div>
             
             <div class="info-group">

@@ -12,7 +12,7 @@ public class DailyTask {
     private Date taskDate;        // 任务日期
     private String title;         // 任务标题
     private String content;       // 任务内容
-    private Integer status;       // 状态(0:未完成, 1:已完成)
+    private String status;        // 状态("pending":未完成, "completed":已完成)
     private Integer priority;     // 优先级(0-5)
     private Date completedTime;   // 完成时间
     private Date createTime;      // 创建时间
@@ -82,20 +82,20 @@ public class DailyTask {
         this.content = content;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public Integer getPriority() {
         return priority;
     }
 
     public void setPriority(Integer priority) {
         this.priority = priority;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public Date getCompletedTime() {
@@ -131,7 +131,7 @@ public class DailyTask {
                 ", taskDate=" + taskDate +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", status=" + status +
+                ", status='" + status + '\'' +
                 ", priority=" + priority +
                 ", completedTime=" + completedTime +
                 ", createTime=" + createTime +

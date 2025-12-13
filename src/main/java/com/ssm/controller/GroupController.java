@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -279,9 +280,24 @@ public class GroupController {
     public String view(@RequestParam("groupId") Integer groupId, Model model) {
         GroupInfo group = groupInfoService.findById(groupId);
         if (group != null) {
-            List<Integer> members = groupInfoService.getGroupMembers(groupId);
+            List<Integer> memberIds = groupInfoService.getGroupMembers(groupId);
+            // 查询成员详细信息
+            List<Student> members = new ArrayList<>();
+            if (memberIds != null && !memberIds.isEmpty()) {
+                for (Integer memberId : memberIds) {
+                    Student student = studentService.findById(memberId);
+                    if (student != null) {
+                        members.add(student);
+                    }
+                }
+            }
+            // 查询组长信息
+            if (group.getLeaderId() != null) {
+                Student leader = studentService.findById(group.getLeaderId());
+                group.setLeader(leader);
+            }
+            group.setMembers(members);
             model.addAttribute("group", group);
-            model.addAttribute("members", members);
         }
         return "group/view";
     }

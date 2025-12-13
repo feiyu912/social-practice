@@ -107,11 +107,11 @@
                                     </div>
                                 </div>
                                 <div style="display:flex;align-items:center;gap:15px;">
-                                    <span class="status-badge ${task.status == 1 ? 'status-completed' : 'status-pending'}">
-                                        ${task.status == 1 ? '已完成' : '未完成'}
+                                    <span class="status-badge ${task.status == 'completed' ? 'status-completed' : 'status-pending'}">
+                                        ${task.status == 'completed' ? '已完成' : '未完成'}
                                     </span>
                                     <div class="task-actions">
-                                        <c:if test="${task.status == 0}">
+                                        <c:if test="${task.status == 'pending'}">
                                             <button class="btn btn-complete" onclick="completeTask(${task.taskId})">完成</button>
                                         </c:if>
                                         <button class="btn btn-delete" onclick="deleteTask(${task.taskId})">删除</button>

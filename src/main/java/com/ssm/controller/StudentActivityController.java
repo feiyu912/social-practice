@@ -41,7 +41,7 @@ public class StudentActivityController {
     private PracticeActivityService practiceActivityService;
 
     /**
-     * 学生报名活动（只有招募中的活动可以报名）
+     * 学生报名活动（只有招募中且在有效时间范围内的活动可以报名）
      */
     @RequestMapping(value = "register", method = {org.springframework.web.bind.annotation.RequestMethod.GET, org.springframework.web.bind.annotation.RequestMethod.POST})
     @ResponseBody
@@ -70,22 +70,44 @@ public class StudentActivityController {
                 return result;
             }
             
-            // 检查活动是否为招募中状态
+            // 检查是否已经报名
+            if (studentActivityService.isStudentRegistered(student.getId(), activityId)) {
+                result.put("success", false);
+                result.put("message", "您已经报名过该活动，无法重复报名");
+                return result;
+            }
+            
+            // 检查活动是否存在
             PracticeActivity activity = practiceActivityService.findById(activityId);
             if (activity == null) {
                 result.put("success", false);
                 result.put("message", "活动不存在");
                 return result;
             }
+            
+            // 检查当前时间是否在活动时间范围内
+            java.util.Date now = new java.util.Date();
+            if (activity.getStartTime() != null && now.before(activity.getStartTime())) {
+                result.put("success", false);
+                result.put("message", "活动还未开始，无法报名");
+                return result;
+            }
+            if (activity.getEndTime() != null && now.after(activity.getEndTime())) {
+                result.put("success", false);
+                result.put("message", "活动已结束，无法报名");
+                return result;
+            }
+            
+            // 检查活动状态
             if (!"recruiting".equals(activity.getStatus())) {
                 result.put("success", false);
-                result.put("message", "只有招募中的活动可以报名");
+                result.put("message", "该活动已停止招募，无法报名");
                 return result;
             }
 
             boolean success = studentActivityService.registerActivity(student.getId(), activityId);
             result.put("success", success);
-            result.put("message", success ? "报名成功，请等待教师审核" : "报名失败，可能已报名或活动不可报名");
+            result.put("message", success ? "报名成功，请等待教师审核" : "报名失败，请稍后重试");
             return result;
         } catch (Exception e) {
             e.printStackTrace();

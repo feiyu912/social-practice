@@ -117,8 +117,8 @@
                 
                 <div class="form-group">
                     <label>性别 *</label>
-                    <input type="radio" name="gender" value="1" <c:if test="${student.gender == 1}">checked</c:if>> 男
-                    <input type="radio" name="gender" value="0" <c:if test="${student.gender == 0}">checked</c:if>> 女
+                    <input type="radio" name="gender" value="男" <c:if test="${student.gender == '男'}">checked</c:if>> 男
+                    <input type="radio" name="gender" value="女" <c:if test="${student.gender == '女'}">checked</c:if>> 女
                 </div>
                 
                 <div class="form-group">

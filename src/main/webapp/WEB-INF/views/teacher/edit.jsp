@@ -107,8 +107,8 @@
             <div class="form-group">
                 <label for="gender">性别：</label>
                 <select id="gender" name="gender" required>
-                    <option value="男" ${teacher.gender == 1 ? 'selected' : ''}>男</option>
-                    <option value="女" ${teacher.gender == 0 ? 'selected' : ''}>女</option>
+                    <option value="男" ${teacher.gender == '男' ? 'selected' : ''}>男</option>
+                    <option value="女" ${teacher.gender == '女' ? 'selected' : ''}>女</option>
                 </select>
             </div>
             

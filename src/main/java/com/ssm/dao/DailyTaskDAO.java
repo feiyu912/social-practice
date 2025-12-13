@@ -30,7 +30,7 @@ public interface DailyTaskDAO {
      * @param status 状态
      * @return 任务列表
      */
-    List<DailyTask> findByStudentIdAndStatus(@Param("studentId") Integer studentId, @Param("status") Integer status);
+    List<DailyTask> findByStudentIdAndStatus(@Param("studentId") Integer studentId, @Param("status") String status);
 
     /**
      * 根据日期范围查询任务
@@ -78,7 +78,7 @@ public interface DailyTaskDAO {
      * @param status 状态
      * @return 影响行数
      */
-    int updateStatus(@Param("taskId") Integer taskId, @Param("status") Integer status);
+    int updateStatus(@Param("taskId") Integer taskId, @Param("status") String status);
 
     /**
      * 更新任务完成时间

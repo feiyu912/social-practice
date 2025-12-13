@@ -12,7 +12,7 @@ public class Teacher {
     private String phone;        // 手机号
     private String email;        // 邮箱
     private String realName;     // 真实姓名（从user表关联获取）
-    private Integer gender;      // 性别（1:男, 0:女）
+    private String gender;      // 性别（"男" 或 "女"）
     private String college;      // 学院（与department相同或别名）
     private String position;     // 职务
 
@@ -84,11 +84,11 @@ public class Teacher {
         this.realName = realName;
     }
 
-    public Integer getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Integer gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
