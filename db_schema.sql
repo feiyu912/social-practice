@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` VARCHAR(50) NOT NULL COMMENT '用户名',
   `password` VARCHAR(100) NOT NULL COMMENT '密码',
+  `email` VARCHAR(100) COMMENT '邮箱',
+  `phone` VARCHAR(20) COMMENT '手机号码',
   `role` VARCHAR(20) NOT NULL DEFAULT 'student' COMMENT '角色(admin/teacher/student)',
   `status` TINYINT(4) NOT NULL DEFAULT 1 COMMENT '状态(0:禁用,1:启用)',
   `name` VARCHAR(50) COMMENT '真实姓名',

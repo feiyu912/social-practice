@@ -60,14 +60,9 @@ DEFAULT CHARACTER SET utf8mb4
 DEFAULT COLLATE utf8mb4_unicode_ci;
 ```
 
-3. 导入表结构：
+3. 导入表结构和初始数据：
 ```bash
 mysql -u root -p student_practice < db_schema.sql
-```
-
-4. 导入测试数据（可选）：
-```bash
-mysql -u root -p student_practice < db.sql
 ```
 
 ### 步骤 3: 修改配置

@@ -140,9 +140,9 @@
                 <label for="email">邮箱:</label>
                 <input type="email" id="email" name="email" 
                        value="${teacher.email}" placeholder="请输入电子邮箱">
-            <div>
+            </div>
             
-            <div>
+            <div class="form-group" style="margin-top: 20px;">
                 <button type="submit" class="btn">保存</button>
                 <button type="button" class="btn btn-secondary" onclick="window.location.href='/teacher/list'">返回列表</button>
             </div>

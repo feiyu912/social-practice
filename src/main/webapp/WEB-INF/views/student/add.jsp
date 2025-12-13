@@ -97,7 +97,7 @@
                 
                 <div class="form-group">
                     <label for="studentId">学号 *</label>
-                    <input type="text" id="studentId" name="studentId" value="${student.studentId}" required placeholder="请输入学号">
+                    <input type="text" id="studentId" name="studentId" value="${student.studentNumber}" required placeholder="请输入学号">
                 </div>
                 
                 <div class="form-group">

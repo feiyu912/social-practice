@@ -5,6 +5,19 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.0.1] - 2025-12-13
+
+### 修复
+- 修复数据库 `user` 表缺少 `email` 和 `phone` 字段导致注册失败的问题
+- 修复 `teacher/add.jsp` 中 HTML `<div>` 标签未闭合导致页面异常的问题
+- 修复 `student/add.jsp` 表单显示学号字段名不一致的问题（`studentId` → `studentNumber`）
+
+### 更新
+- `db_schema.sql` 添加 `email` 和 `phone` 字段到 `user` 表
+- 优化表单字段映射一致性
+
+---
+
 ## [1.0.0] - 2025-12-13
 
 ### 新增

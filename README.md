@@ -71,7 +71,7 @@ DEFAULT COLLATE utf8mb4_unicode_ci;
 
 #### 2.2 导入表结构和测试数据
 
-项目根目录下的 `db_schema.sql` 文件包含测试数据。在导入前请确保数据库表结构已创建。
+项目根目录下的 `db_schema.sql` 文件包含完整的数据库表结构。请确保先执行该文件初始化数据库。
 
 ```bash
 mysql -u root -p student_practice < db_schema.sql
@@ -154,7 +154,7 @@ SocialPractice/
 │               ├── activity/             # 活动相关视图
 │               ├── group/                # 小组相关视图
 │               └── ...
-├── db_schema.sql                                # 数据库测试数据
+├── db_schema.sql                         # 数据库表结构和初始数据
 ├── pom.xml                               # Maven配置
 └── README.md                             # 项目说明
 ```
@@ -247,6 +247,7 @@ SocialPractice/
 ## 版本历史
 
 | 版本 | 日期 | 更新内容 |
-|------|------|---------|
-| v1.0.0 | 2025-12 | 初始版本，实现基础功能 |
+|------|------|--------|
+| v1.0.1 | 2025-12-13 | 修复注册功能、表单字段映射、HTML语法错误 |
+| v1.0.0 | 2025-12-13 | 初始版本，实现基础功能 |
 
