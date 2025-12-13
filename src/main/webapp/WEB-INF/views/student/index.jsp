@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,6 +58,51 @@
             background-color: #e6f7ff;
             color: #1890ff;
             border-right: 3px solid #1890ff;
+        }
+        .notice-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .notice-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        .notice-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .notice-list li {
+            padding: 10px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+        .notice-list li:last-child {
+            border-bottom: none;
+        }
+        .notice-list a {
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notice-list a:hover {
+            color: #1890ff;
+        }
+        .notice-list .notice-time {
+            color: #999;
+            font-size: 12px;
+        }
+        .notice-empty {
+            color: #999;
+            text-align: center;
+            padding: 20px;
         }
         .content {
             flex: 1;
@@ -150,12 +196,13 @@
         <div class="sidebar">
             <ul class="sidebar-menu">
                 <li><a href="/index">首页</a></li>
-                <li><a href="/activity/list">实践活动</a></li>
+                <li><a href="/activity/student_list">实践活动</a></li>
                 <li><a href="/studentActivity/myActivities">我的活动</a></li>
                 <li><a href="/group/manage">小组管理</a></li>
                 <li><a href="/dailyTask/myTasks">日常任务</a></li>
                 <li><a href="/practiceReport/list">实践报告</a></li>
-                <li><a href="/grade/view">我的成绩</a></li>
+                <li><a href="/grade/myGrades">我的成绩</a></li>
+                <li><a href="/notice/list">系统公告</a></li>
             </ul>
         </div>
         
@@ -163,6 +210,27 @@
             <div class="welcome-card">
                 <h2>欢迎回来，${sessionScope.user.name}！</h2>
                 <p>这里是您的学生工作台，您可以在这里查看实践活动、管理日常任务、提交实践报告等。</p>
+            </div>
+            
+            <div class="notice-section">
+                <h3>📢 最新公告</h3>
+                <c:choose>
+                    <c:when test="${empty notices}">
+                        <div class="notice-empty">暂无公告</div>
+                    </c:when>
+                    <c:otherwise>
+                        <ul class="notice-list">
+                            <c:forEach items="${notices}" var="notice">
+                                <li>
+                                    <a href="/notice/view?id=${notice.id}">
+                                        <span>${notice.title}</span>
+                                        <span class="notice-time"><fmt:formatDate value="${notice.publishTime}" pattern="MM-dd"/></span>
+                                    </a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </c:otherwise>
+                </c:choose>
             </div>
             
             <div class="stats-section">
@@ -181,7 +249,7 @@
             </div>
             
             <div class="function-grid">
-                <a href="/activity/list" class="function-card">
+                <a href="/activity/student_list" class="function-card">
                     <div class="icon">🔍</div>
                     <h3>浏览实践活动</h3>
                     <p>查看所有可报名的社会实践活动，了解活动详情和要求</p>
@@ -211,7 +279,7 @@
                     <p>提交实践报告，查看教师反馈和评语</p>
                 </a>
                 
-                <a href="/grade/view" class="function-card">
+                <a href="/grade/myGrades" class="function-card">
                     <div class="icon">📊</div>
                     <h3>我的成绩</h3>
                     <p>查看实践活动成绩和教师评语</p>

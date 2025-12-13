@@ -1,24 +1,17 @@
 package com.ssm.controller;
 
-import com.ssm.entity.GradeInfo;
-import com.ssm.entity.Student;
-import com.ssm.entity.Teacher;
-import com.ssm.entity.User;
-import com.ssm.service.GradeInfoService;
-import com.ssm.service.StudentService;
-import com.ssm.service.TeacherService;
+import com.ssm.entity.*;
+import com.ssm.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,8 +30,14 @@ public class GradeInfoController {
     @Autowired
     private TeacherService teacherService;
 
+    @Autowired
+    private PracticeActivityService practiceActivityService;
+
+    @Autowired
+    private StudentActivityService studentActivityService;
+
     /**
-     * 跳转到成绩列表页面
+     * 成绩管理主页面 - 教师/管理员评分
      */
     @RequestMapping("list")
     public String gradeList(@RequestParam(value = "activityId", required = false) Integer activityId,
@@ -48,47 +47,175 @@ public class GradeInfoController {
             return "redirect:/login";
         }
 
-        List<GradeInfo> grades = new java.util.ArrayList<>();
         String role = user.getRole();
-
-        if (activityId != null) {
-            if ("teacher".equals(role)) {
-                Teacher teacher = teacherService.findByUserId(user.getUserId());
-                if (teacher != null) {
-                    grades = gradeInfoService.findByTeacherId(teacher.getId())
-                            .stream()
-                            .filter(g -> activityId.equals(g.getActivityId()))
-                            .collect(Collectors.toList());
-                }
-            } else if ("student".equals(role)) {
-                Student student = studentService.findByUserId(user.getUserId());
-                if (student != null) {
-                    grades = gradeInfoService.findAllGradesByStudentAndActivity(student.getId(), activityId);
-                }
-            } else {
-                grades = gradeInfoService.findByActivityId(activityId);
+        List<PracticeActivity> activities = new ArrayList<>();
+        
+        // 获取可管理的活动列表
+        if ("teacher".equals(role)) {
+            Teacher teacher = teacherService.findByUserId(user.getUserId());
+            if (teacher != null) {
+                activities = practiceActivityService.findByTeacherId(teacher.getId());
             }
+        } else if ("admin".equals(role)) {
+            activities = practiceActivityService.findAll();
+        } else if ("student".equals(role)) {
+            // 学生查看自己的成绩
+            return "redirect:/grade/view";
         }
-
-        Map<Integer, String> studentNames = new HashMap<>();
-        Map<Integer, String> teacherNames = new HashMap<>();
-        for (GradeInfo grade : grades) {
-            if (grade.getStudentId() != null && !studentNames.containsKey(grade.getStudentId())) {
-                Student stu = studentService.findById(grade.getStudentId());
-                studentNames.put(grade.getStudentId(), stu != null ? stu.getRealName() : "-");
-            }
-            if (grade.getTeacherId() != null && !teacherNames.containsKey(grade.getTeacherId())) {
-                Teacher teacher = teacherService.findById(grade.getTeacherId());
-                teacherNames.put(grade.getTeacherId(), teacher != null ? teacher.getRealName() : "-");
-            }
-        }
-
-        model.addAttribute("grades", grades);
-        model.addAttribute("activityId", activityId);
-        model.addAttribute("studentNames", studentNames);
-        model.addAttribute("teacherNames", teacherNames);
+        
+        model.addAttribute("activities", activities);
         model.addAttribute("role", role);
+        
+        // 如果选择了活动，获取该活动的学生列表和成绩
+        if (activityId != null) {
+            PracticeActivity currentActivity = practiceActivityService.findById(activityId);
+            model.addAttribute("currentActivity", currentActivity);
+            model.addAttribute("activityId", activityId);
+            
+            // 获取该活动已通过审核的学生列表
+            List<StudentActivity> studentActivities = studentActivityService.findByActivityIdWithStudent(activityId);
+            // 只保留已通过审核的学生
+            studentActivities = studentActivities.stream()
+                    .filter(sa -> sa.getStatus() != null && sa.getStatus() == 1)
+                    .collect(Collectors.toList());
+            
+            // 获取每个学生的成绩信息
+            List<Map<String, Object>> studentGradeList = new ArrayList<>();
+            Teacher currentTeacher = null;
+            if ("teacher".equals(role)) {
+                currentTeacher = teacherService.findByUserId(user.getUserId());
+            }
+            
+            for (StudentActivity sa : studentActivities) {
+                Map<String, Object> item = new HashMap<>();
+                Student stu = sa.getStudent();
+                item.put("studentActivity", sa);
+                item.put("student", stu);
+                
+                if (stu != null) {
+                    // 获取该学生在该活动的所有评分
+                    List<GradeInfo> grades = gradeInfoService.findAllGradesByStudentAndActivity(stu.getId(), activityId);
+                    item.put("grades", grades);
+                    
+                    // 计算平均分
+                    Double avgScore = gradeInfoService.getAverageScoreByStudentAndActivity(stu.getId(), activityId);
+                    item.put("avgScore", avgScore);
+                    
+                    // 检查当前教师是否已评分
+                    if (currentTeacher != null) {
+                        boolean hasGraded = gradeInfoService.hasGradeByTeacher(stu.getId(), activityId, currentTeacher.getId());
+                        item.put("hasGraded", hasGraded);
+                        
+                        // 获取当前教师的评分
+                        GradeInfo myGrade = gradeInfoService.findByStudentAndActivityAndTeacher(stu.getId(), activityId, currentTeacher.getId());
+                        item.put("myGrade", myGrade);
+                    }
+                }
+                studentGradeList.add(item);
+            }
+            
+            model.addAttribute("studentGradeList", studentGradeList);
+            model.addAttribute("currentTeacher", currentTeacher);
+        }
+        
         return "grade/list";
+    }
+    
+    /**
+     * AJAX评分接口
+     */
+    @RequestMapping(value = "doGrade", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> doGrade(@RequestParam("studentId") Integer studentId,
+                                        @RequestParam("activityId") Integer activityId,
+                                        @RequestParam("score") Double score,
+                                        @RequestParam(value = "comment", required = false) String comment,
+                                        HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        User user = (User) session.getAttribute("user");
+        
+        if (user == null || !"teacher".equals(user.getRole())) {
+            result.put("success", false);
+            result.put("message", "只有教师可以评分");
+            return result;
+        }
+        
+        Teacher teacher = teacherService.findByUserId(user.getUserId());
+        if (teacher == null) {
+            result.put("success", false);
+            result.put("message", "教师信息不存在");
+            return result;
+        }
+        
+        // 检查是否已评分
+        if (gradeInfoService.hasGradeByTeacher(studentId, activityId, teacher.getId())) {
+            result.put("success", false);
+            result.put("message", "您已经对该学生评分，请使用修改功能");
+            return result;
+        }
+        
+        GradeInfo gradeInfo = new GradeInfo();
+        gradeInfo.setStudentId(studentId);
+        gradeInfo.setActivityId(activityId);
+        gradeInfo.setTeacherId(teacher.getId());
+        gradeInfo.setScore(score);
+        gradeInfo.setComment(comment);
+        gradeInfo.setGradeTime(new Date());
+        gradeInfo.setUpdateTime(new Date());
+        
+        boolean success = gradeInfoService.addGrade(gradeInfo);
+        result.put("success", success);
+        result.put("message", success ? "评分成功" : "评分失败");
+        return result;
+    }
+    
+    /**
+     * AJAX修改评分接口
+     */
+    @RequestMapping(value = "updateGrade", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updateGrade(@RequestParam("gradeId") Integer gradeId,
+                                            @RequestParam("score") Double score,
+                                            @RequestParam(value = "comment", required = false) String comment,
+                                            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        User user = (User) session.getAttribute("user");
+        
+        if (user == null) {
+            result.put("success", false);
+            result.put("message", "请先登录");
+            return result;
+        }
+        
+        GradeInfo gradeInfo = gradeInfoService.findById(gradeId);
+        if (gradeInfo == null) {
+            result.put("success", false);
+            result.put("message", "评分记录不存在");
+            return result;
+        }
+        
+        // 检查权限
+        if ("teacher".equals(user.getRole())) {
+            Teacher teacher = teacherService.findByUserId(user.getUserId());
+            if (teacher == null || !teacher.getId().equals(gradeInfo.getTeacherId())) {
+                result.put("success", false);
+                result.put("message", "您只能修改自己的评分");
+                return result;
+            }
+        } else if (!"admin".equals(user.getRole())) {
+            result.put("success", false);
+            result.put("message", "没有权限");
+            return result;
+        }
+        
+        gradeInfo.setScore(score);
+        gradeInfo.setComment(comment);
+        gradeInfo.setUpdateTime(new Date());
+        
+        boolean success = gradeInfoService.updateGrade(gradeInfo);
+        result.put("success", success);
+        result.put("message", success ? "修改成功" : "修改失败");
+        return result;
     }
     
     /**
@@ -245,5 +372,60 @@ public class GradeInfoController {
             gradeInfoService.deleteGrade(id);
         }
         return "redirect:list";
+    }
+    
+    /**
+     * 学生查看我的成绩（已结束活动的成绩）
+     */
+    @RequestMapping("myGrades")
+    public String myGrades(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        
+        if (user == null || !"student".equals(user.getRole())) {
+            return "redirect:/login";
+        }
+        
+        Student student = studentService.findByUserId(user.getUserId());
+        if (student == null) {
+            model.addAttribute("error", "学生信息不存在");
+            return "grade/myGrades";
+        }
+        
+        // 获取学生参与的已结束活动
+        List<StudentActivity> studentActivities = studentActivityService.findByStudentIdWithActivity(student.getId());
+        List<Map<String, Object>> gradeList = new ArrayList<>();
+        
+        for (StudentActivity sa : studentActivities) {
+            // 只显示已结束的活动成绩
+            if (sa.getActivity() != null && "finished".equals(sa.getActivity().getStatus()) && sa.getStatus() != null && sa.getStatus() == 1) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("activity", sa.getActivity());
+                
+                // 获取该活动的成绩
+                List<GradeInfo> grades = gradeInfoService.findAllGradesByStudentAndActivity(student.getId(), sa.getActivityId());
+                Double avgScore = gradeInfoService.getAverageScoreByStudentAndActivity(student.getId(), sa.getActivityId());
+                
+                item.put("grades", grades);
+                item.put("avgScore", avgScore != null ? avgScore : 0);
+                
+                // 收集教师评语
+                StringBuilder comments = new StringBuilder();
+                for (GradeInfo g : grades) {
+                    if (g.getComment() != null && !g.getComment().isEmpty()) {
+                        Teacher t = teacherService.findById(g.getTeacherId());
+                        if (t != null) {
+                            comments.append(t.getRealName()).append(": ").append(g.getComment()).append("; ");
+                        }
+                    }
+                }
+                item.put("comments", comments.toString());
+                
+                gradeList.add(item);
+            }
+        }
+        
+        model.addAttribute("gradeList", gradeList);
+        model.addAttribute("student", student);
+        return "grade/myGrades";
     }
 }

@@ -6,68 +6,66 @@
         <id column="id" property="id" />
         <result column="user_id" property="userId" />
         <result column="username" property="username" />
-        <result column="operation_type" property="operationType" />
-        <result column="operation_desc" property="operationDesc" />
-        <result column="ip_address" property="ipAddress" />
-        <result column="operation_time" property="operationTime" />
+        <result column="operation" property="operation" />
+        <result column="method" property="method" />
+        <result column="params" property="params" />
+        <result column="ip" property="ip" />
+        <result column="create_time" property="createTime" />
     </resultMap>
+
+    <select id="findAll" resultMap="SystemLogResultMap">
+        SELECT * FROM system_log ORDER BY create_time DESC
+    </select>
 
     <select id="findById" parameterType="Integer" resultMap="SystemLogResultMap">
         SELECT * FROM system_log WHERE id = #{logId}
     </select>
 
     <select id="findByUserId" parameterType="Integer" resultMap="SystemLogResultMap">
-        SELECT * FROM system_log WHERE user_id = #{userId} ORDER BY operation_time DESC
+        SELECT * FROM system_log WHERE user_id = #{userId} ORDER BY create_time DESC
     </select>
 
     <select id="findByOperationType" parameterType="String" resultMap="SystemLogResultMap">
-        SELECT * FROM system_log WHERE operation_type = #{operationType} ORDER BY operation_time DESC
+        SELECT * FROM system_log WHERE operation LIKE CONCAT('%', #{operationType}, '%') ORDER BY create_time DESC
     </select>
-
-    <select id="findAll" resultMap="SystemLogResultMap">
-        SELECT * FROM system_log ORDER BY operation_time DESC
-    </select>
-
+    
     <select id="findByTimeRange" resultMap="SystemLogResultMap">
         SELECT * FROM system_log 
-        WHERE operation_time BETWEEN #{startTime} AND #{endTime}
-        ORDER BY operation_time DESC
+        WHERE create_time BETWEEN #{startTime} AND #{endTime}
+        ORDER BY create_time DESC
     </select>
-
+    
     <select id="searchLogs" parameterType="String" resultMap="SystemLogResultMap">
         SELECT * FROM system_log 
         WHERE username LIKE CONCAT('%', #{keyword}, '%') 
-           OR operation_desc LIKE CONCAT('%', #{keyword}, '%')
-        ORDER BY operation_time DESC
+           OR operation LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY create_time DESC
     </select>
 
     <insert id="insert" parameterType="com.ssm.entity.SystemLog" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO system_log (user_id, username, operation_type, operation_desc, ip_address, operation_time)
-        VALUES (#{userId}, #{username}, #{operationType}, #{operationDesc}, #{ipAddress}, #{operationTime})
+        INSERT INTO system_log (user_id, username, operation, method, params, ip, create_time)
+        VALUES (#{userId}, #{username}, #{operation}, #{method}, #{params}, #{ip}, #{createTime})
     </insert>
-
+    
     <update id="update" parameterType="com.ssm.entity.SystemLog">
-        UPDATE system_log
-        SET user_id = #{userId},
-            username = #{username},
-            operation_type = #{operationType},
-            operation_desc = #{operationDesc},
-            ip_address = #{ipAddress},
-            operation_time = #{operationTime}
+        UPDATE system_log SET
+            operation = #{operation},
+            method = #{method},
+            params = #{params}
         WHERE id = #{id}
     </update>
 
     <delete id="delete" parameterType="Integer">
         DELETE FROM system_log WHERE id = #{logId}
     </delete>
-
+    
     <delete id="batchDelete">
         DELETE FROM system_log WHERE id IN
-        <foreach collection="logIds" item="logId" open="(" separator="," close=")">
-            #{logId}
+        <foreach collection="logIds" item="id" open="(" separator="," close=")">
+            #{id}
         </foreach>
     </delete>
-
+    
     <delete id="clearLogs">
         DELETE FROM system_log
     </delete>

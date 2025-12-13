@@ -1,20 +1,17 @@
 package com.ssm.controller;
 
-import com.ssm.entity.PracticeReport;
-import com.ssm.entity.User;
-import com.ssm.entity.Student;
-import com.ssm.service.PracticeReportService;
-import com.ssm.service.StudentService;
+import com.ssm.entity.*;
+import com.ssm.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 实践报告控制器
@@ -28,6 +25,15 @@ public class PracticeReportController {
 
     @Autowired
     private StudentService studentService;
+    
+    @Autowired
+    private PracticeActivityService practiceActivityService;
+    
+    @Autowired
+    private TeacherService teacherService;
+    
+    @Autowired
+    private StudentActivityService studentActivityService;
 
     /**
      * 跳转到报告列表页面
@@ -36,34 +42,70 @@ public class PracticeReportController {
     public String reportList(@RequestParam(value = "activityId", required = false) Integer activityId,
                              Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        List<PracticeReport> reports;
+        if (user == null) {
+            return "redirect:/login";
+        }
         
-        if (user != null && "student".equals(user.getRole())) {
+        String role = user.getRole();
+        List<PracticeReport> reports = new ArrayList<>();
+        List<PracticeActivity> activities = new ArrayList<>();
+        
+        if ("student".equals(role)) {
             // 学生查看自己的报告
-            com.ssm.entity.Student student = studentService.findByUserId(user.getUserId());
+            Student student = studentService.findByUserId(user.getUserId());
             if (student != null) {
                 reports = practiceReportService.findByStudentId(student.getId());
-            } else {
-                reports = List.of();
+                // 获取学生已通过的活动列表
+                List<StudentActivity> saList = studentActivityService.findByStudentIdWithActivity(student.getId());
+                for (StudentActivity sa : saList) {
+                    if (sa.getStatus() != null && sa.getStatus() == 1 && sa.getActivity() != null) {
+                        activities.add(sa.getActivity());
+                    }
+                }
             }
-        } else if (user != null && "teacher".equals(user.getRole())) {
+        } else if ("teacher".equals(role)) {
             // 教师查看所负责活动的报告
+            Teacher teacher = teacherService.findByUserId(user.getUserId());
+            if (teacher != null) {
+                activities = practiceActivityService.findByTeacherId(teacher.getId());
+            }
             if (activityId != null) {
                 reports = practiceReportService.findByActivityId(activityId);
-            } else {
-                reports = practiceReportService.findByStatus("pending"); // 待审核的报告
+            } else if (!activities.isEmpty()) {
+                activityId = activities.get(0).getId();
+                reports = practiceReportService.findByActivityId(activityId);
             }
         } else {
             // 管理员查看所有报告
+            activities = practiceActivityService.findAll();
             if (activityId != null) {
                 reports = practiceReportService.findByActivityId(activityId);
-            } else {
-                reports = practiceReportService.findByStatus("pending"); // 默认显示待审核的报告
+            } else if (!activities.isEmpty()) {
+                activityId = activities.get(0).getId();
+                reports = practiceReportService.findByActivityId(activityId);
+            }
+        }
+        
+        // 获取当前活动信息
+        if (activityId != null) {
+            PracticeActivity currentActivity = practiceActivityService.findById(activityId);
+            model.addAttribute("currentActivity", currentActivity);
+        }
+        
+        // 获取学生姓名映射
+        Map<Integer, String> studentNames = new HashMap<>();
+        for (PracticeReport report : reports) {
+            if (report.getStudentId() != null && !studentNames.containsKey(report.getStudentId())) {
+                Student stu = studentService.findById(report.getStudentId());
+                studentNames.put(report.getStudentId(), stu != null ? stu.getRealName() : "未知");
             }
         }
         
         model.addAttribute("reports", reports);
+        model.addAttribute("activities", activities);
         model.addAttribute("activityId", activityId);
+        model.addAttribute("studentNames", studentNames);
+        model.addAttribute("role", role);
         return "report/list";
     }
     
@@ -207,5 +249,46 @@ public class PracticeReportController {
             practiceReportService.deleteReport(id);
         }
         return "redirect:list";
+    }
+    
+    /**
+     * 教师审核报告（通过/拒绝）
+     */
+    @RequestMapping("review")
+    @ResponseBody
+    public Map<String, Object> review(@RequestParam("id") Integer id,
+                                       @RequestParam("status") String status,
+                                       @RequestParam(value = "feedback", required = false) String feedback,
+                                       HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        User user = (User) session.getAttribute("user");
+        
+        if (user == null) {
+            result.put("success", false);
+            result.put("message", "请先登录");
+            return result;
+        }
+        
+        if (!"teacher".equals(user.getRole()) && !"admin".equals(user.getRole())) {
+            result.put("success", false);
+            result.put("message", "只有教师和管理员可以审核报告");
+            return result;
+        }
+        
+        PracticeReport report = practiceReportService.findById(id);
+        if (report == null) {
+            result.put("success", false);
+            result.put("message", "报告不存在");
+            return result;
+        }
+        
+        report.setStatus(status);
+        report.setFeedback(feedback);
+        report.setUpdateTime(new Date());
+        
+        boolean success = practiceReportService.updateReport(report);
+        result.put("success", success);
+        result.put("message", success ? "审核成功" : "审核失败");
+        return result;
     }
 }

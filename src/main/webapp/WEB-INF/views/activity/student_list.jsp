@@ -178,7 +178,7 @@
     <script type="text/javascript">
         function registerActivity(activityId) {
             if (confirm('确定要报名此活动吗？')) {
-                fetch('/activity/register?activityId=' + activityId, {
+                fetch('/studentActivity/register?activityId=' + activityId, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -186,11 +186,9 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    alert(data.message);
                     if (data.success) {
-                        alert(data.message);
                         location.reload();
-                    } else {
-                        alert(data.message);
                     }
                 })
                 .catch(error => {

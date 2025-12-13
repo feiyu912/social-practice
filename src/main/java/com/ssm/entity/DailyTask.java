@@ -8,6 +8,7 @@ import java.util.Date;
 public class DailyTask {
     private Integer taskId;       // 任务ID
     private Integer studentId;    // 学生ID
+    private Integer activityId;   // 关联活动ID
     private Date taskDate;        // 任务日期
     private String title;         // 任务标题
     private String content;       // 任务内容
@@ -16,6 +17,9 @@ public class DailyTask {
     private Date completedTime;   // 完成时间
     private Date createTime;      // 创建时间
     private Date updateTime;      // 更新时间
+    
+    // 关联对象
+    private PracticeActivity activity;
 
     // 构造方法
     public DailyTask() {
@@ -36,6 +40,22 @@ public class DailyTask {
 
     public void setStudentId(Integer studentId) {
         this.studentId = studentId;
+    }
+    
+    public Integer getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(Integer activityId) {
+        this.activityId = activityId;
+    }
+    
+    public PracticeActivity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(PracticeActivity activity) {
+        this.activity = activity;
     }
 
     public String getTitle() {
@@ -107,6 +127,7 @@ public class DailyTask {
         return "DailyTask{" +
                 "taskId=" + taskId +
                 ", studentId=" + studentId +
+                ", activityId=" + activityId +
                 ", taskDate=" + taskDate +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +

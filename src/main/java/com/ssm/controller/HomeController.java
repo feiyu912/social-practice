@@ -1,5 +1,6 @@
 package com.ssm.controller;
 
+import com.ssm.entity.Notice;
 import com.ssm.entity.PracticeActivity;
 import com.ssm.entity.Teacher;
 import com.ssm.entity.User;
@@ -41,6 +42,9 @@ public class HomeController {
 
     @Autowired
     private GradeInfoService gradeInfoService;
+    
+    @Autowired
+    private NoticeService noticeService;
 
     @RequestMapping("/")
     public String index() {
@@ -56,6 +60,13 @@ public class HomeController {
 
         String role = user.getRole();
         model.addAttribute("user", user);
+        
+        // 获取最新公告（显示已发布的公告）
+        List<Notice> notices = noticeService.findValidNotices();
+        if (notices != null && notices.size() > 5) {
+            notices = notices.subList(0, 5); // 只显示最新5条
+        }
+        model.addAttribute("notices", notices);
 
         if ("admin".equals(role)) {
             // 管理员首页统计数据

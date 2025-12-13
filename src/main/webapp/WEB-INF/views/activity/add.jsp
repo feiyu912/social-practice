@@ -70,6 +70,30 @@
             margin-top: 5px;
             font-size: 14px;
         }
+        .teacher-select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #fafafa;
+        }
+        .teacher-checkbox {
+            display: inline-block;
+            margin-right: 15px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: white;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+        }
+        .teacher-checkbox:hover {
+            background-color: #f0f0f0;
+        }
+        .teacher-checkbox input {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -117,9 +141,26 @@
             </div>
             
             <div class="form-group">
-                <label for="teacherName">指导老师:</label>
-                <input type="text" id="teacherName" name="teacherName" 
-                       value="${activity.teacherName}" placeholder="请输入指导老师姓名">
+                <label for="maxParticipants">招募最大人数:</label>
+                <input type="number" id="maxParticipants" name="maxParticipants" 
+                       value="${activity.maxParticipants != null ? activity.maxParticipants : 50}" 
+                       min="1" max="500" placeholder="请输入最大人数">
+            </div>
+            
+            <div class="form-group">
+                <label>指导老师 (可多选):</label>
+                <div class="teacher-select">
+                    <c:forEach items="${teachers}" var="teacher">
+                        <label class="teacher-checkbox">
+                            <input type="checkbox" name="teacherIds" value="${teacher.id}">
+                            ${teacher.realName}
+                            <c:if test="${not empty teacher.department}">- ${teacher.department}</c:if>
+                        </label>
+                    </c:forEach>
+                    <c:if test="${empty teachers}">
+                        <span style="color:#999;">暂无可选教师</span>
+                    </c:if>
+                </div>
             </div>
             
             <div class="form-group">

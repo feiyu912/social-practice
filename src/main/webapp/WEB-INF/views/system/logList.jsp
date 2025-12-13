@@ -168,8 +168,8 @@
                         <tr>
                             <th>ID</th>
                             <th>用户名</th>
-                            <th>操作类型</th>
-                            <th>操作描述</th>
+                            <th>操作说明</th>
+                            <th>请求方法</th>
                             <th>IP地址</th>
                             <th>操作时间</th>
                             <th>操作</th>
@@ -178,23 +178,11 @@
                             <tr>
                                 <td>${log.id}</td>
                                 <td>${log.username}</td>
+                                <td class="operation-desc">${log.operation}</td>
+                                <td>${log.method}</td>
+                                <td>${log.ip}</td>
                                 <td>
-                                    <span class="operation-type type-${log.operationType}">
-                                        <c:choose>
-                                            <c:when test="${log.operationType == 'login'}">登录</c:when>
-                                            <c:when test="${log.operationType == 'logout'}">登出</c:when>
-                                            <c:when test="${log.operationType == 'create'}">创建</c:when>
-                                            <c:when test="${log.operationType == 'update'}">更新</c:when>
-                                            <c:when test="${log.operationType == 'delete'}">删除</c:when>
-                                            <c:when test="${log.operationType == 'query'}">查询</c:when>
-                                            <c:otherwise>${log.operationType}</c:otherwise>
-                                        </c:choose>
-                                    </span>
-                                </td>
-                                <td class="operation-desc">${log.operationDesc}</td>
-                                <td>${log.ipAddress}</td>
-                                <td>
-                                    <fmt:formatDate value="${log.operationTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                    <fmt:formatDate value="${log.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </td>
                                 <td>
                                     <a href="/systemLog/view?id=${log.id}" class="btn-view">查看详情</a>

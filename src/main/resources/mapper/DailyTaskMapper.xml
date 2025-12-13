@@ -5,6 +5,7 @@
     <resultMap id="DailyTaskResultMap" type="com.ssm.entity.DailyTask">
         <id column="id" property="taskId" />
         <result column="student_id" property="studentId" />
+        <result column="activity_id" property="activityId" />
         <result column="title" property="title" />
         <result column="task_date" property="taskDate" />
         <result column="content" property="content" />
@@ -44,8 +45,8 @@
     </select>
 
     <insert id="insert" parameterType="com.ssm.entity.DailyTask" useGeneratedKeys="true" keyProperty="taskId">
-        INSERT INTO daily_task (student_id, title, content, task_date, status, priority, create_time, update_time)
-        VALUES (#{studentId}, #{title}, #{content}, #{taskDate}, #{status}, #{priority}, #{createTime}, #{updateTime})
+        INSERT INTO daily_task (student_id, activity_id, title, content, task_date, status, priority, create_time, update_time)
+        VALUES (#{studentId}, #{activityId}, #{title}, #{content}, #{taskDate}, #{status}, #{priority}, #{createTime}, #{updateTime})
     </insert>
 
     <update id="update" parameterType="com.ssm.entity.DailyTask">
@@ -77,4 +78,17 @@
             #{taskId}
         </foreach>
     </delete>
+    
+    <select id="findByStudentIdAndActivityId" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task 
+        WHERE student_id = #{studentId} 
+        <if test="activityId != null">
+            AND activity_id = #{activityId}
+        </if>
+        ORDER BY task_date DESC
+    </select>
+    
+    <select id="findByActivityId" parameterType="Integer" resultMap="DailyTaskResultMap">
+        SELECT * FROM daily_task WHERE activity_id = #{activityId} ORDER BY task_date DESC
+    </select>
 </mapper>

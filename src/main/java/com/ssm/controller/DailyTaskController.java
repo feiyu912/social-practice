@@ -1,11 +1,7 @@
 package com.ssm.controller;
 
-import com.ssm.entity.DailyTask;
-import com.ssm.entity.PracticeActivity;
-import com.ssm.entity.User;
-import com.ssm.service.DailyTaskService;
-import com.ssm.service.PracticeActivityService;
-import com.ssm.service.StudentService;
+import com.ssm.entity.*;
+import com.ssm.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,10 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 日常任务管理控制器
@@ -35,6 +28,12 @@ public class DailyTaskController {
 
     @Autowired
     private PracticeActivityService practiceActivityService;
+    
+    @Autowired
+    private StudentActivityService studentActivityService;
+    
+    @Autowired
+    private TeacherService teacherService;
 
     /**
      * 学生查看自己的任务列表
@@ -47,8 +46,7 @@ public class DailyTaskController {
             return "redirect:/login";
         }
 
-        // 获取学生ID
-        com.ssm.entity.Student student = studentService.findByUserId(user.getUserId());
+        Student student = studentService.findByUserId(user.getUserId());
         if (student == null) {
             model.addAttribute("error", "学生信息不存在");
             return "dailyTask/list";
@@ -56,6 +54,17 @@ public class DailyTaskController {
 
         List<DailyTask> tasks = dailyTaskService.findByStudentId(student.getId());
         model.addAttribute("tasks", tasks);
+        
+        // 获取学生已通过的活动列表，用于添加任务时选择
+        List<PracticeActivity> activities = new ArrayList<>();
+        List<StudentActivity> saList = studentActivityService.findByStudentIdWithActivity(student.getId());
+        for (StudentActivity sa : saList) {
+            if (sa.getStatus() != null && sa.getStatus() == 1 && sa.getActivity() != null) {
+                activities.add(sa.getActivity());
+            }
+        }
+        model.addAttribute("activities", activities);
+        
         return "dailyTask/list";
     }
 
@@ -66,6 +75,7 @@ public class DailyTaskController {
     @ResponseBody
     public Map<String, Object> add(@RequestParam("title") String title,
                                    @RequestParam("content") String content,
+                                   @RequestParam(value = "activityId", required = false) Integer activityId,
                                    @RequestParam(value = "taskDate", required = false) String taskDateStr,
                                    @RequestParam(value = "priority", required = false) Integer priority,
                                    HttpSession session) {
@@ -79,8 +89,7 @@ public class DailyTaskController {
                 return result;
             }
 
-            // 获取学生ID
-            com.ssm.entity.Student student = studentService.findByUserId(user.getUserId());
+            Student student = studentService.findByUserId(user.getUserId());
             if (student == null) {
                 result.put("success", false);
                 result.put("message", "学生信息不存在");
@@ -89,6 +98,7 @@ public class DailyTaskController {
 
             DailyTask task = new DailyTask();
             task.setStudentId(student.getId());
+            task.setActivityId(activityId);
             task.setTitle(title);
             task.setContent(content);
             task.setPriority(priority != null ? priority : 0);
@@ -130,7 +140,6 @@ public class DailyTaskController {
                 return result;
             }
 
-            // 检查任务是否属于当前学生
             DailyTask task = dailyTaskService.findById(taskId);
             if (task == null) {
                 result.put("success", false);
@@ -138,7 +147,7 @@ public class DailyTaskController {
                 return result;
             }
 
-            com.ssm.entity.Student student = studentService.findByUserId(user.getUserId());
+            Student student = studentService.findByUserId(user.getUserId());
             if (student == null || !student.getId().equals(task.getStudentId())) {
                 result.put("success", false);
                 result.put("message", "没有权限操作此任务");
@@ -156,55 +165,62 @@ public class DailyTaskController {
     }
 
     /**
-     * 教师查看学生的任务（按活动）
+     * 教师查看学生的任务（改进版，支持活动选择）
      */
-    @RequestMapping("viewByActivity")
-    public String viewByActivity(@RequestParam(value = "activityId", required = false) Integer activityId,
-                                 @RequestParam(value = "studentId", required = false) Integer studentId,
-                                 Model model, HttpSession session) {
+    @RequestMapping("list")
+    public String list(@RequestParam(value = "activityId", required = false) Integer activityId,
+                       Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        
-        if (user == null || (!"teacher".equals(user.getRole()) && !"admin".equals(user.getRole()))) {
+        if (user == null) {
             return "redirect:/login";
         }
-
-        // 如果没有提供activityId，显示活动列表供选择
-        if (activityId == null) {
-            List<PracticeActivity> activities = practiceActivityService.findAll();
-            model.addAttribute("activities", activities);
-            return "dailyTask/selectActivity";
-        }
-
-        // 根据活动ID和学生ID查询任务
-        // 这里需要根据活动ID和学生ID查询任务
-        // 简化处理，实际应该关联查询
-        List<DailyTask> tasks;
-        if (studentId != null) {
-            // 查询特定学生的任务
-            tasks = dailyTaskService.findByStudentId(studentId);
-        } else {
-            // 如果没有指定学生，先显示空列表
-            // 实际应该根据活动ID查询该活动下所有学生的任务
-            tasks = new java.util.ArrayList<>();
+        
+        String role = user.getRole();
+        List<PracticeActivity> activities = new ArrayList<>();
+        List<Map<String, Object>> studentTasks = new ArrayList<>();
+        
+        if ("teacher".equals(role)) {
+            Teacher teacher = teacherService.findByUserId(user.getUserId());
+            if (teacher != null) {
+                activities = practiceActivityService.findByTeacherId(teacher.getId());
+            }
+        } else if ("admin".equals(role)) {
+            activities = practiceActivityService.findAll();
+        } else if ("student".equals(role)) {
+            return "redirect:/dailyTask/myTasks";
         }
         
-        PracticeActivity activity = practiceActivityService.findById(activityId);
+        // 如果选择了活动，获取该活动下所有学生的任务
+        if (activityId != null) {
+            PracticeActivity currentActivity = practiceActivityService.findById(activityId);
+            model.addAttribute("currentActivity", currentActivity);
+            
+            // 获取该活动的已通过学生
+            List<StudentActivity> saList = studentActivityService.findByActivityIdWithStudent(activityId);
+            for (StudentActivity sa : saList) {
+                if (sa.getStatus() != null && sa.getStatus() == 1 && sa.getStudent() != null) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("student", sa.getStudent());
+                    // 获取该学生的任务
+                    List<DailyTask> tasks = dailyTaskService.findByStudentIdAndActivityId(sa.getStudent().getId(), activityId);
+                    item.put("tasks", tasks);
+                    item.put("taskCount", tasks.size());
+                    long completedCount = tasks.stream().filter(t -> t.getStatus() != null && t.getStatus() == 1).count();
+                    item.put("completedCount", completedCount);
+                    studentTasks.add(item);
+                }
+            }
+        } else if (!activities.isEmpty()) {
+            // 默认选择第一个活动
+            activityId = activities.get(0).getId();
+            return "redirect:/dailyTask/list?activityId=" + activityId;
+        }
+        
+        model.addAttribute("activities", activities);
         model.addAttribute("activityId", activityId);
-        model.addAttribute("activity", activity);
-        model.addAttribute("studentId", studentId);
-        model.addAttribute("tasks", tasks);
-        return "dailyTask/view";
-    }
-
-    /**
-     * 教师查看学生的任务（按活动）- 支持viewByActivitys URL
-     */
-    @RequestMapping("viewByActivitys")
-    public String viewByActivitys(@RequestParam(value = "activityId", required = false) Integer activityId,
-                                  @RequestParam(value = "studentId", required = false) Integer studentId,
-                                  Model model, HttpSession session) {
-        // 重定向到viewByActivity方法
-        return viewByActivity(activityId, studentId, model, session);
+        model.addAttribute("studentTasks", studentTasks);
+        model.addAttribute("role", role);
+        return "dailyTask/teacherList";
     }
 
     /**

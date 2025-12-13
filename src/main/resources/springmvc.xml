@@ -27,6 +27,12 @@
 
     <!-- 5. 配置拦截器 -->
     <mvc:interceptors>
+        <!-- 日志拦截器 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.ssm.interceptor.LogInterceptor"/>
+        </mvc:interceptor>
+        <!-- 权限拦截器 -->
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
             <bean class="com.ssm.interceptor.AuthInterceptor"/>

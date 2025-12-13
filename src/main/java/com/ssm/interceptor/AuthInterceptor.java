@@ -52,22 +52,26 @@ public class AuthInterceptor implements HandlerInterceptor {
                 !path.startsWith("/student/edit") && !path.startsWith("/student/delete")) {
                 return true;
             }
-            if (path.startsWith("/activity/list") || path.startsWith("/activity/view")) {
+            if (path.startsWith("/activity/list") || path.startsWith("/activity/view") || path.startsWith("/activity/student_list")) {
                 return true;
             }
             if (path.startsWith("/studentActivity/")) {
                 return true;
             }
-            if (path.startsWith("/practiceReport/")) {
+            if (path.startsWith("/practiceReport/") || path.startsWith("/report/")) {
                 return true;
             }
             if (path.startsWith("/dailyTask/")) {
                 return true;
             }
-            if (path.startsWith("/grade/view") || path.startsWith("/gradeInfo/view")) {
+            if (path.startsWith("/grade/view") || path.startsWith("/gradeInfo/view") || path.startsWith("/grade/myGrades")) {
                 return true;
             }
             if (path.startsWith("/group/")) {
+                return true;
+            }
+            // 学生可以查看公告
+            if (path.startsWith("/notice/view") || path.startsWith("/notice/list")) {
                 return true;
             }
             // 学生可以退出登录
@@ -89,7 +93,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             if (path.startsWith("/studentActivity/")) {
                 return true;
             }
-            if (path.startsWith("/practiceReport/")) {
+            if (path.startsWith("/practiceReport/") || path.startsWith("/report/")) {
                 return true;
             }
             if (path.startsWith("/grade/") || path.startsWith("/gradeInfo/")) {
@@ -101,14 +105,18 @@ public class AuthInterceptor implements HandlerInterceptor {
             if (path.startsWith("/group/")) {
                 return true;
             }
-            if (path.startsWith("/teacher/view") || path.startsWith("/teacher/edit")) {
+            if (path.startsWith("/teacher/view") || path.startsWith("/teacher/edit") || path.startsWith("/teacher/index")) {
                 // 教师只能查看和编辑自己的信息
+                return true;
+            }
+            // 教师可以查看公告
+            if (path.startsWith("/notice/view") || path.startsWith("/notice/list")) {
                 return true;
             }
             // 教师不能访问学生和用户管理（但允许退出登录）
             if (path.startsWith("/student/") || 
                 (path.startsWith("/user/") && !path.equals("/user/logout")) || 
-                path.startsWith("/admin/")) {
+                path.startsWith("/admin/") || path.startsWith("/systemLog/")) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "您没有权限访问此页面");
                 return false;
             }

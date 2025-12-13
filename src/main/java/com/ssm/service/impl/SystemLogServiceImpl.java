@@ -48,7 +48,7 @@ public class SystemLogServiceImpl implements SystemLogService {
 
     @Override
     public boolean addLog(SystemLog systemLog) {
-        systemLog.setOperationTime(new Date());
+        systemLog.setCreateTime(new Date());
         return systemLogDAO.insert(systemLog) > 0;
     }
 
@@ -77,31 +77,29 @@ public class SystemLogServiceImpl implements SystemLogService {
         SystemLog log = new SystemLog();
         log.setUserId(userId);
         log.setUsername(username);
-        log.setOperationType("登录");
-        log.setOperationDesc("用户登录 - " + username + " - " + result);
-        log.setIpAddress(ipAddress);
-        log.setOperationTime(new Date());
-        addLog(log);
+        log.setOperation("用户登录 - " + result);
+        log.setMethod("POST /user/login");
+        log.setIp(ipAddress);
+        log.setCreateTime(new Date());
+        systemLogDAO.insert(log);
     }
 
     @Override
     public void recordOperationLog(Integer userId, String operationType, String description, String result) {
         SystemLog log = new SystemLog();
         log.setUserId(userId);
-        log.setOperationType(operationType);
-        log.setOperationDesc(description + " - " + result);
-        log.setOperationTime(new Date());
-        addLog(log);
+        log.setOperation(operationType + " - " + description + " - " + result);
+        log.setCreateTime(new Date());
+        systemLogDAO.insert(log);
     }
 
     @Override
     public void recordErrorLog(Integer userId, String operationType, String description, String errorInfo) {
         SystemLog log = new SystemLog();
         log.setUserId(userId);
-        log.setOperationType(operationType);
-        log.setOperationDesc(description + " - 错误信息: " + errorInfo);
-        log.setOperationTime(new Date());
-        addLog(log);
+        log.setOperation(operationType + " - " + description + " - 错误: " + errorInfo);
+        log.setCreateTime(new Date());
+        systemLogDAO.insert(log);
     }
 
     @Override

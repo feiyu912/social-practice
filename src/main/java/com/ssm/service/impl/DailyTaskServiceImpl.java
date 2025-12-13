@@ -131,6 +131,16 @@ public class DailyTaskServiceImpl implements DailyTaskService {
         List<DailyTask> pendingTasks = findByStudentIdAndStatus(studentId, 0);
         return pendingTasks != null ? pendingTasks.size() : 0;
     }
+    
+    @Override
+    public List<DailyTask> findByStudentIdAndActivityId(Integer studentId, Integer activityId) {
+        return dailyTaskDAO.findByStudentIdAndActivityId(studentId, activityId);
+    }
+    
+    @Override
+    public List<DailyTask> findByActivityId(Integer activityId) {
+        return dailyTaskDAO.findByActivityId(activityId);
+    }
 }
 
 

@@ -110,6 +110,21 @@ public interface DailyTaskService {
      * @return 待完成任务数量
      */
     int getPendingTaskCount(Integer studentId);
+    
+    /**
+     * 根据学生ID和活动ID查询任务
+     * @param studentId 学生ID
+     * @param activityId 活动ID
+     * @return 任务列表
+     */
+    List<DailyTask> findByStudentIdAndActivityId(Integer studentId, Integer activityId);
+    
+    /**
+     * 根据活动ID查询所有任务
+     * @param activityId 活动ID
+     * @return 任务列表
+     */
+    List<DailyTask> findByActivityId(Integer activityId);
 }
 
 

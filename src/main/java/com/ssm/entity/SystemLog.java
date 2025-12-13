@@ -9,10 +9,11 @@ public class SystemLog {
     private Integer id;             // 日志ID
     private Integer userId;         // 用户ID
     private String username;        // 用户名
-    private String operationType;   // 操作类型
-    private String operationDesc;   // 操作描述
-    private String ipAddress;       // IP地址
-    private Date operationTime;     // 操作时间
+    private String operation;       // 操作描述
+    private String method;          // 请求方法
+    private String params;          // 请求参数
+    private String ip;              // IP地址
+    private Date createTime;        // 操作时间
 
     // getter和setter方法
     public Integer getId() {
@@ -39,36 +40,44 @@ public class SystemLog {
         this.username = username;
     }
 
-    public String getOperationType() {
-        return operationType;
+    public String getOperation() {
+        return operation;
     }
 
-    public void setOperationType(String operationType) {
-        this.operationType = operationType;
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
-    public String getOperationDesc() {
-        return operationDesc;
+    public String getMethod() {
+        return method;
     }
 
-    public void setOperationDesc(String operationDesc) {
-        this.operationDesc = operationDesc;
+    public void setMethod(String method) {
+        this.method = method;
     }
 
-    public String getIpAddress() {
-        return ipAddress;
+    public String getParams() {
+        return params;
     }
 
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
+    public void setParams(String params) {
+        this.params = params;
     }
 
-    public Date getOperationTime() {
-        return operationTime;
+    public String getIp() {
+        return ip;
     }
 
-    public void setOperationTime(Date operationTime) {
-        this.operationTime = operationTime;
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     @Override
@@ -77,10 +86,10 @@ public class SystemLog {
                 "id=" + id +
                 ", userId=" + userId +
                 ", username='" + username + '\'' +
-                ", operationType='" + operationType + '\'' +
-                ", operationDesc='" + operationDesc + '\'' +
-                ", ipAddress='" + ipAddress + '\'' +
-                ", operationTime=" + operationTime +
+                ", operation='" + operation + '\'' +
+                ", method='" + method + '\'' +
+                ", ip='" + ip + '\'' +
+                ", createTime=" + createTime +
                 '}';
     }
 }

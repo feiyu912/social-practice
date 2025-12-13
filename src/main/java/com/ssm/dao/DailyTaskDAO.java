@@ -108,4 +108,19 @@ public interface DailyTaskDAO {
      * @return 统计信息
      */
     List<Object[]> getTaskStatistics(@Param("studentId") Integer studentId);
+    
+    /**
+     * 根据学生ID和活动ID查询任务
+     * @param studentId 学生ID
+     * @param activityId 活动ID
+     * @return 任务列表
+     */
+    List<DailyTask> findByStudentIdAndActivityId(@Param("studentId") Integer studentId, @Param("activityId") Integer activityId);
+    
+    /**
+     * 根据活动ID查询所有任务
+     * @param activityId 活动ID
+     * @return 任务列表
+     */
+    List<DailyTask> findByActivityId(@Param("activityId") Integer activityId);
 }

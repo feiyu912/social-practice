@@ -258,14 +258,30 @@ public class StudentActivityController {
             List<PracticeActivity> teacherActivities = null;
             
             if ("teacher".equals(user.getRole())) {
-                // 获取教师负责的活动
+                // 获取教师负责的活动（只显示招募中/进行中的活动）
                 Teacher teacher = teacherService.findByUserId(user.getUserId());
                 if (teacher != null) {
-                    teacherActivities = practiceActivityService.findByTeacherId(teacher.getId());
+                    List<PracticeActivity> allTeacherActivities = practiceActivityService.findByTeacherId(teacher.getId());
+                    teacherActivities = new ArrayList<>();
+                    if (allTeacherActivities != null) {
+                        for (PracticeActivity a : allTeacherActivities) {
+                            if ("recruiting".equals(a.getStatus()) || "ongoing".equals(a.getStatus())) {
+                                teacherActivities.add(a);
+                            }
+                        }
+                    }
                 }
             } else {
-                // 管理员可以看到所有活动
-                teacherActivities = practiceActivityService.findAll();
+                // 管理员可以看到所有招募中/进行中的活动
+                List<PracticeActivity> allPracticeActivities = practiceActivityService.findAll();
+                teacherActivities = new ArrayList<>();
+                if (allPracticeActivities != null) {
+                    for (PracticeActivity a : allPracticeActivities) {
+                        if ("recruiting".equals(a.getStatus()) || "ongoing".equals(a.getStatus())) {
+                            teacherActivities.add(a);
+                        }
+                    }
+                }
             }
             
             if (activityId != null) {

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -153,6 +154,51 @@
             color: #666;
             font-size: 14px;
         }
+        .notice-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .notice-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        .notice-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .notice-list li {
+            padding: 10px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+        .notice-list li:last-child {
+            border-bottom: none;
+        }
+        .notice-list a {
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notice-list a:hover {
+            color: #52c41a;
+        }
+        .notice-list .notice-time {
+            color: #999;
+            font-size: 12px;
+        }
+        .notice-empty {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -171,9 +217,10 @@
                 <li><a href="/activity/list">我的活动</a></li>
                 <li><a href="/activity/add">发布活动</a></li>
                 <li><a href="/studentActivity/list">报名管理</a></li>
-                <li><a href="/dailyTask/viewByActivity">学生任务</a></li>
+                <li><a href="/dailyTask/list">学生任务</a></li>
                 <li><a href="/practiceReport/list">报告审核</a></li>
                 <li><a href="/grade/list">成绩评定</a></li>
+                <li><a href="/notice/list">系统公告</a></li>
             </ul>
         </div>
         
@@ -181,6 +228,27 @@
             <div class="welcome-card">
                 <h2>欢迎回来，${sessionScope.user.name}老师！</h2>
                 <p>这里是您的教师工作台，您可以在这里发布活动、管理学生、评定成绩等。</p>
+            </div>
+            
+            <div class="notice-section">
+                <h3>📢 最新公告</h3>
+                <c:choose>
+                    <c:when test="${empty notices}">
+                        <div class="notice-empty">暂无公告</div>
+                    </c:when>
+                    <c:otherwise>
+                        <ul class="notice-list">
+                            <c:forEach items="${notices}" var="notice">
+                                <li>
+                                    <a href="/notice/view?id=${notice.id}">
+                                        <span>${notice.title}</span>
+                                        <span class="notice-time"><fmt:formatDate value="${notice.publishTime}" pattern="MM-dd"/></span>
+                                    </a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </c:otherwise>
+                </c:choose>
             </div>
             
             <div class="stats-section">
@@ -217,7 +285,7 @@
                     <p>查看活动报名情况，审核学生报名申请</p>
                 </a>
                 
-                <a href="/dailyTask/viewByActivity" class="function-card">
+                <a href="/dailyTask/list" class="function-card">
                     <div class="icon">📝</div>
                     <h3>学生日常任务</h3>
                     <p>查看和管理学生提交的日常任务完成情况</p>
