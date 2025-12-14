@@ -231,9 +231,9 @@
                 <ul>
                     <li>文件格式：CSV（逗号分隔）</li>
                     <li>编码格式：UTF-8</li>
-                    <li>必需字段：工号、姓名、部门</li>
+                    <li>必需字段：工号、姓名、性别、部门、职务</li>
                     <li>可选字段：手机号、邮箱</li>
-                    <li>示例格式：工号,姓名,部门,手机号,邮箱</li>
+                    <li>示例格式：工号,姓名,性别,部门,职务,手机号,邮箱</li>
                 </ul>
             </div>
 
@@ -257,7 +257,7 @@
             </div>
 
             <div class="actions">
-                <a href="/admin/index" class="btn-secondary">返回管理后台</a>
+                <a href="/index" class="btn-secondary">返回首页</a>
                 <a href="/teacher/list" class="btn-secondary">查看教师列表</a>
             </div>
         </div>

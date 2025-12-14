@@ -17,34 +17,26 @@
     </resultMap>
 
     <select id="findById" parameterType="Integer" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
         WHERE t.id = #{teacherId}
     </select>
 
     <select id="findByUserId" parameterType="Integer" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
         WHERE t.user_id = #{userId}
     </select>
 
     <select id="findByTeacherNumber" parameterType="String" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
         WHERE t.teacher_id = #{teacherNumber}
     </select>
 
     <select id="findAll" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
         LIMIT #{offset}, #{limit}
     </select>
 
@@ -53,18 +45,19 @@
     </select>
 
     <insert id="insert" parameterType="com.ssm.entity.Teacher" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO teacher (teacher_id, department, phone, email, user_id, gender, position)
-        VALUES (#{teacherNumber}, #{department}, #{phone}, #{email}, #{userId}, #{gender}, #{position})
+        INSERT INTO teacher (teacher_id, real_name, gender, department, phone, position, email, user_id)
+        VALUES (#{teacherNumber}, #{realName}, #{gender}, #{department}, #{phone}, #{position}, #{email}, #{userId})
     </insert>
 
     <update id="update" parameterType="com.ssm.entity.Teacher">
         UPDATE teacher
         SET teacher_id = #{teacherNumber},
+            real_name = #{realName},
+            gender = #{gender},
             department = #{department},
             phone = #{phone},
-            email = #{email},
-            gender = #{gender},
-            position = #{position}
+            position = #{position},
+            email = #{email}
         WHERE id = #{id}
     </update>
 
@@ -73,36 +66,28 @@
     </delete>
 
     <select id="searchByKeyword" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
         WHERE t.teacher_id LIKE CONCAT('%', #{keyword}, '%')
-           OR u.name LIKE CONCAT('%', #{keyword}, '%')
+           OR t.real_name LIKE CONCAT('%', #{keyword}, '%')
         LIMIT #{offset}, #{limit}
     </select>
     
     <select id="findByName" parameterType="String" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
-        WHERE u.name = #{name}
+        WHERE t.real_name = #{name}
     </select>
     
     <select id="findByDepartment" parameterType="String" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
         WHERE t.department = #{department}
     </select>
     
     <select id="findByTitle" parameterType="String" resultMap="TeacherResultMap">
-        SELECT t.id, t.teacher_id, t.department, t.department as college, t.user_id, t.phone, t.email, t.gender, t.position,
-               u.name as real_name
+        SELECT t.id, t.teacher_id, t.real_name, t.gender, t.department, t.position, t.phone, t.email, t.user_id
         FROM teacher t
-        LEFT JOIN user u ON t.user_id = u.id
-        WHERE t.department = #{title}
+        WHERE t.position = #{title}
     </select>
 </mapper>

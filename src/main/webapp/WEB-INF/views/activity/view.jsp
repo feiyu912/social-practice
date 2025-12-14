@@ -198,7 +198,14 @@
         </div>
         
         <div class="btn-group">
-            <a href="/activity/list" class="btn btn-secondary">返回列表</a>
+            <c:choose>
+                <c:when test="${sessionScope.user.role eq 'student'}">
+                    <a href="/studentActivity/myActivities" class="btn btn-secondary">返回列表</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="/activity/list" class="btn btn-secondary">返回列表</a>
+                </c:otherwise>
+            </c:choose>
             <c:if test="${sessionScope.user.role eq 'teacher' or sessionScope.user.role eq 'admin'}">
                 <a href="/activity/edit?id=${activity.id}" class="btn btn-primary">编辑活动</a>
             </c:if>

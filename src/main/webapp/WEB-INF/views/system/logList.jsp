@@ -130,21 +130,27 @@
             padding: 40px;
             color: #999;
         }
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 8px 16px;
-            background-color: #6c757d;
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #1890ff;
             color: white;
-            text-decoration: none;
+            border: none;
             border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
         }
-        .back-link:hover {
-            background-color: #5a6268;
+        .back-button:hover {
+            background-color: #40a9ff;
         }
     </style>
 </head>
 <body>
+    <a href="/index" class="back-button">返回首页</a>
     <div class="content">
         <h2 class="page-title">系统日志</h2>
         
@@ -152,7 +158,6 @@
             <form action="/systemLog/list" method="get">
                 <input type="text" name="searchKey" placeholder="请输入用户名或操作描述关键词" value="${searchKey}">
                 <button type="submit">搜索</button>
-                <a href="/admin/index" class="back-link">返回管理后台</a>
             </form>
         </div>
         

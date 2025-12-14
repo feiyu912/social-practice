@@ -142,7 +142,7 @@
     </style>
 </head>
 <body>
-    <a href="javascript:history.back()" class="back-button">返回上一页</a>
+    <a href="/index" class="back-button">返回首页</a>
     <div class="content">
         <h2 class="page-title">公告管理</h2>
         

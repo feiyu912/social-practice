@@ -126,37 +126,29 @@
                 <span class="info-value">${log.username}</span>
             </div>
             <div class="info-item">
-                <span class="info-label">操作类型:</span>
-                <span class="info-value">
-                    <span class="operation-type type-${log.operationType}">
-                        <c:choose>
-                            <c:when test="${log.operationType == 'login'}">登录</c:when>
-                            <c:when test="${log.operationType == 'logout'}">登出</c:when>
-                            <c:when test="${log.operationType == 'create'}">创建</c:when>
-                            <c:when test="${log.operationType == 'update'}">更新</c:when>
-                            <c:when test="${log.operationType == 'delete'}">删除</c:when>
-                            <c:when test="${log.operationType == 'query'}">查询</c:when>
-                            <c:otherwise>${log.operationType}</c:otherwise>
-                        </c:choose>
-                    </span>
-                </span>
+                <span class="info-label">操作:</span>
+                <span class="info-value">${log.operation}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">IP地址:</span>
-                <span class="info-value">${log.ipAddress}</span>
+                <span class="info-value">${log.ip}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">操作时间:</span>
                 <span class="info-value">
-                    <fmt:formatDate value="${log.operationTime}" pattern="yyyy-MM-dd HH:mm:ss" />
+                    <fmt:formatDate value="${log.createTime}" pattern="yyyy-MM-dd HH:mm:ss" />
                 </span>
             </div>
         </div>
         
-        <div class="operation-desc">
-            <strong>操作描述:</strong><br>
-            ${log.operationDesc}
-        </div>
+            <div class="info-item">
+                <span class="info-label">请求方法:</span>
+                <span class="info-value">${log.method}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">请求参数:</span>
+                <span class="info-value">${log.params}</span>
+            </div>
         
         <div style="margin-top: 20px;">
             <a href="/systemLog/list" class="btn">返回列表</a>

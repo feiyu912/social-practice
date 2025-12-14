@@ -131,9 +131,9 @@
             <h3 class="modal-title">添加日常任务</h3>
             <form id="addForm">
                 <div class="form-group">
-                    <label>关联活动（可选）</label>
-                    <select name="activityId">
-                        <option value="">不关联活动</option>
+                    <label>关联活动 *</label>
+                    <select name="activityId" required>
+                        <option value="">请选择活动</option>
                         <c:forEach items="${activities}" var="activity">
                             <option value="${activity.id}">${activity.activityName}</option>
                         </c:forEach>

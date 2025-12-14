@@ -95,8 +95,8 @@ public class ImportExportController {
 
             for (int i = 0; i < data.size(); i++) {
                 String[] row = data.get(i);
-                if (row.length < 4) {
-                    errors.add("第" + (i + 1) + "行：数据格式不正确，需要至少4列（学号、姓名、班级、手机号）");
+                if (row.length < 5) {
+                    errors.add("第" + (i + 1) + "行：数据格式不正确，需要至少5列（学号、姓名、性别、班级、手机号）");
                     failCount++;
                     continue;
                 }
@@ -104,9 +104,10 @@ public class ImportExportController {
                 try {
                     String studentNumber = row[0].trim();
                     String name = row[1].trim();
-                    String className = row[2].trim();
-                    String phone = row.length > 3 ? row[3].trim() : "";
-                    String email = row.length > 4 ? row[4].trim() : "";
+                    String gender = row[2].trim();
+                    String className = row[3].trim();
+                    String phone = row.length > 4 ? row[4].trim() : "";
+                    String email = row.length > 5 ? row[5].trim() : "";
 
                     // 检查学号是否已存在
                     if (studentService.isStudentNumberExists(studentNumber)) {
@@ -115,22 +116,45 @@ public class ImportExportController {
                         continue;
                     }
 
+                    // 检查用户名是否已存在
+                    String username = "student_" + studentNumber;
+                    if (userService.findByUsername(username) != null) {
+                        errors.add("第" + (i + 1) + "行：用户名 " + username + " 已存在");
+                        failCount++;
+                        continue;
+                    }
+
                     // 创建用户
                     User newUser = new User();
-                    newUser.setUsername("student_" + studentNumber);
+                    newUser.setUsername(username);
                     newUser.setPassword("123456"); // 默认密码
                     newUser.setRole("student");
                     newUser.setName(name);
                     newUser.setStatus(1);
-                    userService.addUser(newUser);
+                    
+                    if (!userService.addUser(newUser)) {
+                        errors.add("第" + (i + 1) + "行：创建用户失败");
+                        failCount++;
+                        continue;
+                    }
+                    
+                    // 获取新创建的用户ID
+                    User createdUser = userService.findByUsername(username);
+                    if (createdUser == null || createdUser.getUserId() == null) {
+                        errors.add("第" + (i + 1) + "行：无法获取用户ID");
+                        failCount++;
+                        continue;
+                    }
 
                     // 创建学生
                     Student student = new Student();
                     student.setStudentNumber(studentNumber);
+                    student.setRealName(name);
+                    student.setGender(gender);
                     student.setClassName(className);
                     student.setPhone(phone);
                     student.setEmail(email);
-                    student.setUserId(newUser.getUserId());
+                    student.setUserId(createdUser.getUserId());
 
                     if (studentService.addStudent(student)) {
                         successCount++;
@@ -215,8 +239,8 @@ public class ImportExportController {
 
             for (int i = 0; i < data.size(); i++) {
                 String[] row = data.get(i);
-                if (row.length < 3) {
-                    errors.add("第" + (i + 1) + "行：数据格式不正确，需要至少3列（工号、姓名、部门）");
+                if (row.length < 5) {
+                    errors.add("第" + (i + 1) + "行：数据格式不正确，需要至少5列（工号、姓名、性别、部门、职务）");
                     failCount++;
                     continue;
                 }
@@ -224,9 +248,11 @@ public class ImportExportController {
                 try {
                     String teacherNumber = row[0].trim();
                     String name = row[1].trim();
-                    String department = row[2].trim();
-                    String phone = row.length > 3 ? row[3].trim() : "";
-                    String email = row.length > 4 ? row[4].trim() : "";
+                    String gender = row[2].trim();
+                    String department = row[3].trim();
+                    String position = row[4].trim();
+                    String phone = row.length > 5 ? row[5].trim() : "";
+                    String email = row.length > 6 ? row[6].trim() : "";
 
                     // 检查工号是否已存在
                     if (teacherService.isTeacherNumberExists(teacherNumber)) {
@@ -235,22 +261,46 @@ public class ImportExportController {
                         continue;
                     }
 
+                    // 检查用户名是否已存在
+                    String username = "teacher_" + teacherNumber;
+                    if (userService.findByUsername(username) != null) {
+                        errors.add("第" + (i + 1) + "行：用户名 " + username + " 已存在");
+                        failCount++;
+                        continue;
+                    }
+
                     // 创建用户
                     User newUser = new User();
-                    newUser.setUsername("teacher_" + teacherNumber);
+                    newUser.setUsername(username);
                     newUser.setPassword("123456"); // 默认密码
                     newUser.setRole("teacher");
                     newUser.setName(name);
                     newUser.setStatus(1);
-                    userService.addUser(newUser);
+                    
+                    if (!userService.addUser(newUser)) {
+                        errors.add("第" + (i + 1) + "行：创建用户失败");
+                        failCount++;
+                        continue;
+                    }
+                    
+                    // 获取新创建的用户ID
+                    User createdUser = userService.findByUsername(username);
+                    if (createdUser == null || createdUser.getUserId() == null) {
+                        errors.add("第" + (i + 1) + "行：无法获取用户ID");
+                        failCount++;
+                        continue;
+                    }
 
                     // 创建教师
                     Teacher teacher = new Teacher();
                     teacher.setTeacherNumber(teacherNumber);
+                    teacher.setRealName(name);
+                    teacher.setGender(gender);
                     teacher.setDepartment(department);
+                    teacher.setPosition(position);
                     teacher.setPhone(phone);
                     teacher.setEmail(email);
-                    teacher.setUserId(newUser.getUserId());
+                    teacher.setUserId(createdUser.getUserId());
 
                     if (teacherService.addTeacher(teacher)) {
                         successCount++;

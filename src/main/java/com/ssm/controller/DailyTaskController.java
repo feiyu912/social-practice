@@ -96,6 +96,13 @@ public class DailyTaskController {
                 return result;
             }
 
+            // 验证 activityId 不能为空
+            if (activityId == null) {
+                result.put("success", false);
+                result.put("message", "请选择关联活动");
+                return result;
+            }
+
             DailyTask task = new DailyTask();
             task.setStudentId(student.getId());
             task.setActivityId(activityId);

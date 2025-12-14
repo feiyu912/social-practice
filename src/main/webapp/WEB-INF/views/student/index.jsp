@@ -196,7 +196,7 @@
         <div class="sidebar">
             <ul class="sidebar-menu">
                 <li><a href="/index">首页</a></li>
-                <li><a href="/activity/student_list">实践活动</a></li>
+                <li><a href="/activity/list">实践活动</a></li>
                 <li><a href="/studentActivity/myActivities">我的活动</a></li>
                 <li><a href="/group/manage">小组管理</a></li>
                 <li><a href="/dailyTask/myTasks">日常任务</a></li>
@@ -249,7 +249,7 @@
             </div>
             
             <div class="function-grid">
-                <a href="/activity/student_list" class="function-card">
+                <a href="/activity/list" class="function-card">
                     <div class="icon">🔍</div>
                     <h3>浏览实践活动</h3>
                     <p>查看所有可报名的社会实践活动，了解活动详情和要求</p>

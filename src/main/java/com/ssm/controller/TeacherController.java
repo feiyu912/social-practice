@@ -61,9 +61,16 @@ public class TeacherController {
             return "teacher/add";
         }
 
+        // 检查用户名是否已存在
+        String username = "teacher_" + teacherNumber;
+        if (userService.findByUsername(username) != null) {
+            model.addAttribute("errorMsg", "用户名已存在，请使用其他工号");
+            return "teacher/add";
+        }
+
         // 首先创建用户账号
         User user = new User();
-        user.setUsername(teacherNumber); // 使用工号作为用户名
+        user.setUsername(username); // 使用 teacher_ 前缀
         user.setPassword("123456"); // 默认密码
         user.setName(name);
         user.setRole("teacher");
@@ -153,7 +160,12 @@ public class TeacherController {
     @RequestMapping(value="delete")
     public String delete(Integer id) {
         if (id != null) {
-            teacherService.deleteTeacher(id);
+            // 先获取教师信息，找到关联的userId
+            Teacher teacher = teacherService.findById(id);
+            if (teacher != null && teacher.getUserId() != null) {
+                // 删除user记录，会自动级联删除teacher记录（因为外键设置了ON DELETE CASCADE）
+                userService.deleteUser(teacher.getUserId());
+            }
         }
         return "redirect:list";
     }

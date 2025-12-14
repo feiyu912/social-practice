@@ -133,8 +133,8 @@
                                                             <fmt:formatDate value="${task.taskDate}" pattern="yyyy-MM-dd"/>
                                                         </div>
                                                     </div>
-                                                    <span class="task-status ${task.status == 1 ? 'status-completed' : 'status-pending'}">
-                                                        ${task.status == 1 ? '已完成' : '未完成'}
+                                                    <span class="task-status ${task.status == 'completed' ? 'status-completed' : 'status-pending'}">
+                                                        ${task.status == 'completed' ? '已完成' : '未完成'}
                                                     </span>
                                                 </div>
                                             </c:forEach>
